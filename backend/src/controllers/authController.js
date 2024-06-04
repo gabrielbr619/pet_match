@@ -1,0 +1,31 @@
+const { findUserByEmail, findPetOwnerByEmail } = require('../models/User'); // Implemente esta função para buscar usuários e donos de pets por email
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+exports.loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await findUserByEmail(email);
+    if (!user || !await bcrypt.compare(password, user.password)) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.loginPetOwner = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const owner = await findPetOwnerByEmail(email);
+    if (!owner || !await bcrypt.compare(password, owner.password)) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const token = jwt.sign({ id: owner.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
