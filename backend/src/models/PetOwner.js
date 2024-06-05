@@ -9,4 +9,9 @@ const createPetOwner = async (owner) => {
   return res.rows[0];
 };
 
-module.exports = { createPetOwner };
+const findPetOwnerByEmail = async (email) => {
+  const res = await pool.query('SELECT * FROM Pet_owners WHERE email = $1', [email]);
+  return res.rows[0];
+}
+
+module.exports = { createPetOwner, findPetOwnerByEmail };

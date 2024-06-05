@@ -1,4 +1,5 @@
-const { findUserByEmail, findPetOwnerByEmail } = require('../models/User'); // Implemente esta função para buscar usuários e donos de pets por email
+const { findUserByEmail } = require('../models/User'); 
+const { findPetOwnerByEmail } = require('../models/PetOwner');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
