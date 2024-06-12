@@ -1,71 +1,30 @@
-// routes/userRoutes.js
 const express = require('express');
-const { registerUser, userLikePet, getUser, userDeslikePet } = require('../controllers/userController');
+
 const { authToken } = require('../middlewares/authToken');
+const { registerUser, userLikePet, getUser, userDeslikePet } = require('../controllers/userController');
+const { loginUser } = require('../controllers/authController');
+const upload = require('../config/multer');
+
 const router = express.Router();
 
 router.get('/getUser/:id',authToken, getUser);
 
-router.post('/register', registerUser);
+router.post('/register',upload.single('avatar'), registerUser);
+router.post('/login', loginUser);
 
 router.put('/likePet', authToken, userLikePet);
 router.put('/deslikePet', authToken, userDeslikePet);
 
-/**
- * @swagger
- * tags:
- *   name: Users
- *   description: Endpoints relacionados aos usuários
- */
+// router.post('/test',upload.single('avatar'),(req, res)=>{
+//     console.log(req.body)
 
-/**
- * @swagger
- * /users/register:
- *   post:
- *     summary: Registra um novo usuário
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - username
- *               - password
- *               - email
- *               - phone
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *               email:
- *                 type: string
- *               phone:
- *                 type: string
- *               local:
- *                 type: string
- *               pictures:
- *                 type: string
- *                 format: text
- *     responses:
- *       201:
- *         description: Usuário registrado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 username:
- *                   type: string
- *                 email:
- *                   type: string
- *       400:
- *         description: Erro ao registrar usuário
- */
-
+//     try {
+//     //console.log(req.body,req.file, req.files);
+//         res.status(200).send("foi?")
+//     } catch (error) {
+//         res.status(400).send(error)
+        
+//     }
+// })
 
 module.exports = router;
