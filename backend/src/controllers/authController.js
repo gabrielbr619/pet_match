@@ -1,5 +1,8 @@
+require('dotenv').config();
+
 const { findUserByEmail } = require('../models/User'); 
 const { findPetOwnerByEmail } = require('../models/PetOwner');
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -11,7 +14,7 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({ token, user });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

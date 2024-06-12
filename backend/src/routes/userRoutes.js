@@ -1,7 +1,15 @@
 // routes/userRoutes.js
 const express = require('express');
-const { registerUser } = require('../controllers/userController');
+const { registerUser, userLikePet, getUser, userDeslikePet } = require('../controllers/userController');
+const { authToken } = require('../middlewares/authToken');
 const router = express.Router();
+
+router.get('/getUser/:id',authToken, getUser);
+
+router.post('/register', registerUser);
+
+router.put('/likePet', authToken, userLikePet);
+router.put('/deslikePet', authToken, userDeslikePet);
 
 /**
  * @swagger
@@ -58,6 +66,6 @@ const router = express.Router();
  *       400:
  *         description: Erro ao registrar usuário
  */
-router.post('/register', registerUser);
+
 
 module.exports = router;
