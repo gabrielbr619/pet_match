@@ -1,4 +1,4 @@
-const pool = require('./db');
+const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
 const createUser = async (user) => {
@@ -17,9 +17,7 @@ const findUserByEmail = async (email) => {
 }
 
 const findUserById = async (id) => {
-  console.log(id)
   const res = await pool.query(`select * from users u where id = '${id}'`);
-  console.log(res.rows[0]);
   return res.rows[0];
 }
 
