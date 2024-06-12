@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/users', userRoutes);
 app.use('/api/petowners', petOwnerRoutes);

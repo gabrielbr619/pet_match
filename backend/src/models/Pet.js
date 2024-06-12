@@ -1,4 +1,4 @@
-const pool = require('./db');
+const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
 const createPet = async (pet) => {
@@ -11,4 +11,12 @@ const createPet = async (pet) => {
   return res.rows[0];
 };
 
-module.exports = { createPet };
+const deletePet = async (pet_id) => {
+  const res = await pool.query(
+    'DELETE FROM Pets WHERE id = $1 RETURNING *',
+    [pet_id]
+  );
+  return res.rows[0];
+};
+
+module.exports = { createPet, deletePet };
