@@ -1,6 +1,9 @@
 const express = require('express');
 const { addPet, registerPet } = require('../controllers/petController');
+const { authToken } = require('../middlewares/authToken');
 const router = express.Router();
+
+router.post('/add', authToken, registerPet);
 
 /**
  * @swagger
@@ -60,6 +63,5 @@ const router = express.Router();
  *       400:
  *         description: Erro ao adicionar pet
  */
-router.post('/add', registerPet);
 
 module.exports = router;

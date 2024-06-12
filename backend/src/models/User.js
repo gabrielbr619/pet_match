@@ -16,4 +16,23 @@ const findUserByEmail = async (email) => {
   return res.rows[0];
 }
 
-module.exports = { createUser, findUserByEmail };
+const findUserById = async (id) => {
+  console.log(id)
+  const res = await pool.query(`select * from users u where id = '${id}'`);
+  console.log(res.rows[0]);
+  return res.rows[0];
+}
+
+const likePet = async (user, pet_id) => {
+  const res = await pool.query(
+    `UPDATE users SET pets_liked = array_append(pets_liked, $1) WHERE id = $2 RETURNING *;`,[pet_id, user.id])
+  return res.rows[0];
+}
+
+const deslikePet = async (user, pet_id) => {
+  const res = await pool.query(
+    `UPDATE users SET pets_liked = array_remove(pets_liked, $1) WHERE id = $2 RETURNING *;`,[pet_id, user.id])
+  return res.rows[0];
+}
+
+module.exports = { createUser, findUserByEmail, likePet, findUserById, deslikePet };
