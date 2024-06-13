@@ -1,17 +1,16 @@
-import { StyleSheet, Platform, View, Dimensions,Text,TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
-import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
-import { useEffect, useState } from 'react';
 
 const loadFonts = () => {
   return Font.loadAsync({
-    'Montserrat-Regular': require('../../assets/fonts/Montserrat-Regular.ttf'),
-    'Montserrat-Bold': require('../../assets/fonts/Montserrat-Bold.ttf'),
+    'Montserrat-Regular': require('../assets/fonts/Montserrat-Regular.ttf'),
+    'Montserrat-Bold': require('../assets/fonts/Montserrat-Bold.ttf'),
   });
 };
 
-export default function WelcomeScreen() {
+export default function WelcomeScreen({ navigation }) {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
@@ -22,20 +21,21 @@ export default function WelcomeScreen() {
   }, []);
 
   if (!fontsLoaded) {
-    return <AppLoading />;
+    return null; // Return null or a loading spinner if fonts are not loaded yet
   }
 
   return (
-    
-        <View style={styles.container}>
-        <Text style={styles.title}>Encontre seu parceiro</Text>
-        <Text style={styles.subtitle}>Descubra pets adoráveis buscando adoção.</Text>
-        <Image source={require('@/assets/images/man-playing-dog.png')} style={styles.image} resizeMode="contain" />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Quero começar!</Text>
-        </TouchableOpacity>
-        <Text style={styles.footerText}>Já tem conta? <Text style={styles.signInText}>Acesse!</Text></Text>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Encontre seu parceiro</Text>
+      <Text style={styles.subtitle}>Descubra pets adoráveis buscando adoção.</Text>
+      <Image source={require('../assets/svgs/girl_playing_with_dog.svg')} style={styles.image} resizeMode="contain" />
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.buttonText}>Quero começar!</Text>
+      </TouchableOpacity>
+      <Text style={styles.footerText}>
+        Já tem conta? <Text style={styles.signInText} onPress={() => navigation.navigate('Login')}>Acesse!</Text>
+      </Text>
+    </View>
   );
 }
 
@@ -66,7 +66,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#ff5252',
+    backgroundColor: '#fc9355',
+    width: 300,
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 30,
