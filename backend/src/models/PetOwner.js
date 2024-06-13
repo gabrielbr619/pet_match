@@ -11,9 +11,18 @@ const createPetOwner = async (owner) => {
   return res.rows[0];
 };
 
+const updatePetOwnerById = async (id, updatedPetOwnerData) => {
+  const { username, password, email, phone, profile_picture } = updatedPetOwnerData;
+  const res = await pool.query(
+    'UPDATE PetOwners SET username = $2, password = $3, email = $4, phone = $5, profile_picture = $6 WHERE id = $1 RETURNING *',
+    [id, username, password, email, phone, profile_picture]
+  );
+  return res.rows[0];
+};
+
 const findPetOwnerByEmail = async (email) => {
   const res = await pool.query('SELECT * FROM Pet_owners WHERE email = $1', [email]);
   return res.rows[0];
 }
 
-module.exports = { createPetOwner, findPetOwnerByEmail };
+module.exports = { createPetOwner, updatePetOwnerById, findPetOwnerByEmail };

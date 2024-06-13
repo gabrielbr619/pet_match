@@ -70,7 +70,7 @@
  *                 type: string
  *               phone:
  *                 type: string
- *               avatar:
+ *               profile_picture:
  *                 type: string
  *                 format: binary
  *     responses:

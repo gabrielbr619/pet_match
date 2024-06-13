@@ -11,6 +11,16 @@ const createUser = async (user) => {
   return res.rows[0];
 };
 
+const updateUserById = async (id, updatedUserData) => {
+  const { username, password, email, phone, profile_picture } = updatedUserData;
+  const res = await pool.query(
+    'UPDATE Users SET username = $2, password = $3, email = $4, phone = $5, profile_picture = $6 WHERE id = $1 RETURNING *',
+    [id, username, password, email, phone, profile_picture]
+  );
+  return res.rows[0];
+};
+
+
 const findUserByEmail = async (email) => {
   const res = await pool.query('SELECT * FROM Users WHERE email = $1', [email]);
   return res.rows[0];
@@ -33,4 +43,4 @@ const deslikePet = async (user, pet_id) => {
   return res.rows[0];
 }
 
-module.exports = { createUser, findUserByEmail, likePet, findUserById, deslikePet };
+module.exports = { createUser, updateUserById, findUserByEmail, likePet, findUserById, deslikePet };

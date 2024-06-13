@@ -19,4 +19,44 @@ const deletePet = async (pet_id) => {
   return res.rows[0];
 };
 
-module.exports = { createPet, deletePet };
+const getRandomPetForUser = async (user_id, last_pet_id) => {
+  try {
+    const res = await pool.query(
+      `
+      SELECT * FROM pets 
+      WHERE id != $1
+      AND id NOT IN (
+          SELECT pet_id FROM user_disliked_pets 
+          WHERE user_id = $2 AND disliked_at > NOW() - INTERVAL '3 days'
+      )
+      AND id NOT IN (
+          SELECT pet_id FROM user_viewed_pets 
+          WHERE user_id = $2 AND last_viewed > NOW() - INTERVAL '5 minutes'
+      )
+      ORDER BY RANDOM()
+      LIMIT 1;
+       `,
+      [last_pet_id, user_id]
+    );
+    return res.rows[0];
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+const markPetAsViewed = async (user_id, pet_id) => {
+  await pool.query(
+    'INSERT INTO user_viewed_pets (user_id, pet_id) VALUES ($1, $2) ON CONFLICT (user_id, pet_id) DO UPDATE SET last_viewed = CURRENT_TIMESTAMP',
+    [user_id, pet_id]
+  );
+};
+
+const dislikePet = async (user_id, pet_id) => {
+  await pool.query(
+    'INSERT INTO UserDislikedPets (user_id, pet_id) VALUES ($1, $2) ON CONFLICT (user_id, pet_id) DO UPDATE SET disliked_at = CURRENT_TIMESTAMP',
+    [user_id, pet_id]
+  );
+};
+
+module.exports = { createPet, deletePet, getRandomPetForUser, dislikePet, markPetAsViewed };
