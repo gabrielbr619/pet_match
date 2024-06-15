@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { TextInput, Button, Checkbox } from 'react-native-paper';
 import { SocialIcon } from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import * as WebBrowser from 'expo-web-browser';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { API_BASE_URL } from '../App';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const navigation = useNavigation();
+
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: 'YOUR_EXPO_GOOGLE_CLIENT_ID',
@@ -27,7 +31,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/users/login", {
+      const response = await fetch(`${API_BASE_URL}users/login`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -46,9 +50,9 @@ const LoginScreen = ({ navigation }) => {
         // Store the data using AsyncStorage
         await AsyncStorage.setItem('userToken', data.token);
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
-        console.log('ENTROU AQUI PORRA')
+
         // Navigate to the main app screen
-       navigation.navigate('Tabs');
+        navigation.navigate('Tabs', {screen: "Home"});
       } else {
         Alert.alert('Login Failed', data.message || 'An error occurred');
       }

@@ -5,6 +5,7 @@ import { SocialIcon } from 'react-native-elements';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
 import * as WebBrowser from 'expo-web-browser';
+import { API_BASE_URL } from '../App';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -25,7 +26,7 @@ const RegisterScreen = ({ navigation }) => {
   });
 
   const handleRegister = () => {
-    fetch('http://localhost:3000/api/users/register',{
+    fetch(`${API_BASE_URL}users/register`,{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,13 @@
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
+
+const selectPetOwnerById = async (id) => {
+  console.log(id, "aqui")
+  const res = await pool.query('SELECT * FROM Pet_owners WHERE id = $1', [id]);
+  return res.rows[0];
+}
+
 const createPetOwner = async (owner) => {
   const { username, password, email, phone, local, profile_picture } = owner;
   const id = uuidv4();
@@ -25,4 +32,4 @@ const findPetOwnerByEmail = async (email) => {
   return res.rows[0];
 }
 
-module.exports = { createPetOwner, updatePetOwnerById, findPetOwnerByEmail };
+module.exports = { createPetOwner, updatePetOwnerById, findPetOwnerByEmail,selectPetOwnerById };

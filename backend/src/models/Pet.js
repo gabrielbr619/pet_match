@@ -1,6 +1,15 @@
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
+
+const selectPetById = async (pet_id) => {
+  const res = await pool.query(
+    'SELECT * FROM Pets WHERE id = $1',
+    [pet_id]
+  );
+  return res.rows[0];
+}
+
 const createPet = async (pet) => {
   const { name, age, description, race, pictures, owner_id } = pet;
   const id = uuidv4();
@@ -18,7 +27,6 @@ const deletePet = async (pet_id) => {
   );
   return res.rows[0];
 };
-
 const getRandomPetForUser = async (user_id, last_pet_id) => {
   try {
     const res = await pool.query(
@@ -31,7 +39,7 @@ const getRandomPetForUser = async (user_id, last_pet_id) => {
       )
       AND id NOT IN (
           SELECT pet_id FROM user_viewed_pets 
-          WHERE user_id = $2 AND last_viewed > NOW() - INTERVAL '5 minutes'
+          WHERE user_id = $2 AND last_viewed > NOW() - INTERVAL '1 second'
       )
       ORDER BY RANDOM()
       LIMIT 1;
@@ -59,4 +67,4 @@ const dislikePet = async (user_id, pet_id) => {
   );
 };
 
-module.exports = { createPet, deletePet, getRandomPetForUser, dislikePet, markPetAsViewed };
+module.exports = { selectPetById, createPet, deletePet, getRandomPetForUser, dislikePet, markPetAsViewed };

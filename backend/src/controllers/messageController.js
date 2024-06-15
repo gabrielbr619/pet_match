@@ -9,7 +9,6 @@ exports.sendMessage = async (req, res) => {
     let imageUrls = [];
 
     if (req.files) {
-      console.log("ENTROU NO REQ FILES")
       imageUrls = await uploadManyPicutres(req)
     }
 

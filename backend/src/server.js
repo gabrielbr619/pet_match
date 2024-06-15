@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({
   origin: 'http://localhost:8081', // URL do seu frontend
   methods: ['GET', 'PUT', 'DELETE', 'POST'],
-  allowedHeaders: ['Content-Type']
 }));
 
 app.use('/api/users', userRoutes);

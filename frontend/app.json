@@ -1,6 +1,7 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Pet Match",
+    "scheme": "Pet Match",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,3 +26,4 @@
     }
   }
 }
+

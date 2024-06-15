@@ -17,3 +17,11 @@ exports.getChatByIds = async (userId, petOwnerId, petId) => {
   );
   return res.rows[0];
 };
+
+exports.getUserChats = async (userId) =>{
+  const res = await pool.query(
+    'SELECT * FROM chats WHERE user_id = $1',
+    [userId]
+  );
+  return res.rows;
+}

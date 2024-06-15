@@ -33,3 +33,7 @@ exports.loginPetOwner = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+exports.checkToken = (req, res) => {
+  res.status(200).json({ valid: true });
+};

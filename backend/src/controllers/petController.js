@@ -1,11 +1,19 @@
 const pool = require('../config/db');
+const { uploadManyPicutres } = require('../helpers/uploadPictures');
 const { createPet, deletePet, getRandomPetForUser, markPetAsViewed, dislikePet } = require('../models/Pet');
 
 
 
 exports.registerPet = async (req, res) => {
   try {
-    const { name, age, description, race, pictures,owner_id } = req.body;
+    const { name, age, description, race, owner_id } = req.body;
+
+    let pictures = [];
+
+    if (req.files) {
+      pictures = await uploadManyPicutres(req, "pet_pictures")
+    }
+
     const pet = await createPet({ name, age, description, race, pictures, owner_id });
     res.status(201).json(pet);
   } catch (err) {
