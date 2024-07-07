@@ -53,12 +53,12 @@ const ChatsScreen = ({ navigation }) => {
   };
 
   const renderChatItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('Message', { chatId: item.chat_id })}>
+    <TouchableOpacity onPress={() => navigation.navigate('Message', { chatId: item.chat_id, userData, userToken, pet_owner: item.pet_owner, pet: item.pet  })}>
       <ListItem bottomDivider>
         <Avatar rounded source={{ uri: item.pet.pictures[0] }} />
         <ListItem.Content>
           <ListItem.Title>{item.pet.name}</ListItem.Title>
-          <ListItem.Subtitle>{item.pet.description}</ListItem.Subtitle>
+          <ListItem.Subtitle>{item.last_message?.content}</ListItem.Subtitle>
         </ListItem.Content>
         {/* <Text>{item.created_at}</Text> */}
       </ListItem>

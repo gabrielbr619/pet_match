@@ -1,6 +1,7 @@
 const { createChat, getChatByIds, getUserChats } = require('../models/Chat');
 const { selectPetOwnerById } = require('../models/PetOwner');
 const { selectPetById } = require('../models/Pet');
+const { getMessageById } = require('../models/Message');
 
 exports.initiateChat = async (req, res) => {
   try {
@@ -40,12 +41,15 @@ exports.getUserChats = async (req, res) => {
 
       // Consulta assíncrona para obter o pet
       const pet = await selectPetById(chat.pet_id);
-
+      console.log(chat)
+      const last_message = await getMessageById(chat.last_message_sent);
+      console.log(last_message);
       chatsArray.push({
         chat_id: chat.id,
         created_at: chat.created_at,
         pet_owner,
-        pet
+        pet,
+        last_message: last_message? last_message : null,
       });
     }
 

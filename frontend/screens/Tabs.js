@@ -15,12 +15,44 @@ function ChatStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="ChatsStack" component={ChatsScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Message" component={MessageScreen} />
+      <Stack.Screen name="Message" component={MessageScreen} options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }
 
-export default function Tabs() {
+export default function Tabs({isPetOwner}) {
+console.log(isPetOwner)
+  if(isPetOwner){
+    console.log("entrou aq")
+    return(
+      <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Discover') {
+            iconName = focused ? 'search' : 'search-outline';
+          } else if (route.name === 'Chats') {
+            iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+      tabBarOptions={{
+        activeTintColor: '#ff5252',
+        inactiveTintColor: 'gray',
+      }}
+    >
+      <Tab.Screen name="Chats" component={ChatStack} options={{ headerShown: false, tabBarShowLabel: false }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
+    </Tab.Navigator>
+    )
+  }
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -45,6 +77,8 @@ export default function Tabs() {
         inactiveTintColor: 'gray',
       }}
     >
+
+      
       <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false, tabBarShowLabel: false}} />
       <Tab.Screen name="Discover" component={DiscoverScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
       <Tab.Screen name="Chats" component={ChatStack} options={{ headerShown: false, tabBarShowLabel: false }} />

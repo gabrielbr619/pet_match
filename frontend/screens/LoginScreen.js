@@ -52,9 +52,30 @@ const LoginScreen = () => {
         await AsyncStorage.setItem('user', JSON.stringify(data.user));
 
         // Navigate to the main app screen
-        navigation.navigate('Tabs', {screen: "Home"});
+        navigation.navigate('Tabs', {screen: "Home", isPetOwner: false});
       } else {
-        Alert.alert('Login Failed', data.message || 'An error occurred');
+          const response = await fetch(`${API_BASE_URL}petowners/login`, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email,
+              password,
+              remember,
+            }),
+          });
+    
+          const data = await response.json();
+          if (response.ok) {
+            // Store the data using AsyncStorage
+            await AsyncStorage.setItem('userToken', data.token);
+            await AsyncStorage.setItem('user', JSON.stringify(data.owner));
+    
+            // Navigate to the main app screen
+            navigation.navigate('Tabs', {screen: "Chat", isPetOwner: true});
+          }
       }
     } catch (error) {
       console.error(error);

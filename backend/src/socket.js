@@ -4,7 +4,7 @@ const { createMessage } = require('./models/Message'); // Assumindo que você te
 const setupSocket = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: "http://localhost:3001", // URL do seu frontend
+      origin: "http://localhost:8081", // URL do seu frontend
       methods: ["GET", "POST"]
     }
   });

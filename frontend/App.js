@@ -10,7 +10,7 @@ import { View,Text, Platform } from 'react-native';
 
 const Stack = createStackNavigator();
 
-const LOCALHOST = Platform.OS === 'ios' || 'android' ? 'http://192.168.68.106:3000' : 'http://localhost:3000';
+const LOCALHOST = Platform.OS === 'ios' || 'android' ? 'http://localhost:3000' : 'http://192.168.68.106:3000';
 console.log(Platform.OS)
 export const API_BASE_URL = LOCALHOST + '/api/';
 

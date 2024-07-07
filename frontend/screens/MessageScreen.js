@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { GiftedChat, InputToolbar, Send, Actions } from 'react-native-gifted-chat';
-import { Icon } from 'react-native-elements';
+import { Icon, Avatar } from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from 'socket.io-client';
@@ -10,13 +10,16 @@ import { API_BASE_URL } from '../App';
 const SOCKET_SERVER_URL = 'http://localhost:3000'; // Replace with your server URL
 
 const MessageScreen = ({ route, navigation }) => {
+  const { chatId, userData, userToken, pet_owner, pet } = route.params;
   const [messages, setMessages] = useState([]);
   const [images, setImages] = useState([]);
   const [socket, setSocket] = useState(null);
-  const { chatId } = route.params; // Assuming chatId is passed via route params
 
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL);
+    const newSocket = io(SOCKET_SERVER_URL, {
+      transports: ['websocket'],
+    });
+
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -25,35 +28,55 @@ const MessageScreen = ({ route, navigation }) => {
     });
 
     newSocket.on('receiveMessage', (message) => {
-      setMessages((previousMessages) => GiftedChat.append(previousMessages, message));
+      console.log('Received message from socket:', message);
+      setMessages((previousMessages) => GiftedChat.append(previousMessages, formatMessage(message)));
     });
 
-    fetchMessages();
-
     return () => {
+      console.log('Disconnecting from socket server');
       newSocket.disconnect();
     };
   }, [chatId]);
 
-  const fetchMessages = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}messages/${chatId}`);
-      const data = await response.json();
-      setMessages(data.messages); // Assuming the API returns an array of messages
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}messages/${chatId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`,
+          },
+        });
+        const data = await response.json();
+        console.log('Fetched messages:', data);
+        const formattedMessages = data.map(formatMessage);
+        setMessages(formattedMessages); // Assuming the API returns an array of messages
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+    fetchMessages();
+  }, [userToken]);
+
+  const formatMessage = (message) => ({
+    _id: message.id,
+    text: message.content,
+    createdAt: new Date(message.created_at),
+    user: {
+      _id: message.sender_id,
+      name: userData.name || 'User',
+      avatar: userData.avatar || null, // Ensure you have a userData with avatar property
+    },
+    image: message.image_urls.length > 0 ? message.image_urls[0] : null,
+  });
 
   const onSend = useCallback(async (messages = []) => {
-    const userId = await AsyncStorage.getItem('userId');
     const message = messages[0];
-
     const formData = new FormData();
     formData.append('chatId', chatId);
-    formData.append('senderId', userId);
+    formData.append('senderId', userData.id);
     formData.append('content', message.text);
-
     images.forEach((image, index) => {
       formData.append('images', {
         uri: image.uri,
@@ -66,26 +89,29 @@ const MessageScreen = ({ route, navigation }) => {
       const response = await fetch(`${API_BASE_URL}messages/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${userToken}`,
         },
         body: formData,
       });
 
       const data = await response.json();
+      console.log(data)
       if (response.ok) {
-        setMessages((previousMessages) => GiftedChat.append(previousMessages, data.message));
+        console.log('Message sent successfully:', data);
+        const formattedMessage = formatMessage(data);
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, formattedMessage));
         setImages([]); // Clear images after sending
-
+        console.log('entrou aqui')
         // Emit the message to the socket server
-        socket.emit('sendMessage', data.message);
+        socket.emit('sendMessage', formattedMessage);
       } else {
-        Alert.alert('Error', data.message || 'An error occurred');
+        Alert.alert('Error', data || 'An error occurred');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Failed to send message:', error);
       Alert.alert('Error', 'An error occurred. Please try again.');
     }
-  }, [images, socket]);
+  }, [images, socket, chatId, userData.id, userToken]);
 
   const pickImage = async () => {
     ImagePicker.launchImageLibrary(
@@ -127,15 +153,15 @@ const MessageScreen = ({ route, navigation }) => {
     />
   );
 
-  return (
+   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
         </TouchableOpacity>
         <View style={styles.headerTitle}>
-          <Icon name="person" type="material" size={30} />
-          <Text style={styles.headerText}>Anna Smith</Text>
+          <Avatar rounded source={{ uri: pet.pictures[0] }} />
+          <Text style={styles.headerText}>{pet_owner.username}</Text>
         </View>
         <TouchableOpacity>
           <Icon name="settings" type="material" size={30} />
@@ -145,7 +171,7 @@ const MessageScreen = ({ route, navigation }) => {
         messages={messages}
         onSend={messages => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userData.id, // Ensure the user ID is set correctly
         }}
         renderSend={renderSend}
         renderInputToolbar={renderInputToolbar}
