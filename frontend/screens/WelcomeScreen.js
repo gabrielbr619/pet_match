@@ -86,6 +86,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   signInText: {
-    color: '#ff5252',
+    color: '#fc9355',
   },
 });

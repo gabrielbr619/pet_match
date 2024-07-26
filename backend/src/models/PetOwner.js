@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require('uuid');
 
 
 const selectPetOwnerById = async (id) => {
-  console.log(id, "aqui")
   const res = await pool.query('SELECT * FROM Pet_owners WHERE id = $1', [id]);
   return res.rows[0];
 }

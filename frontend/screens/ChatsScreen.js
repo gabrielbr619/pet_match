@@ -68,8 +68,8 @@ const ChatsScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF5252" />
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#fc9355" />
+        <Text>Carregando...</Text>
       </View>
     );
   }
@@ -80,7 +80,7 @@ const ChatsScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Messages</Text>
+        <Text style={styles.headerTitle}>Mensagens</Text>
         <TouchableOpacity>
           <Icon name="settings" type="material" size={30} />
         </TouchableOpacity>
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#fc9355'
   },
   loadingContainer: {
     flex: 1,

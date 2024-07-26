@@ -137,7 +137,7 @@ const LoginScreen = () => {
           <Checkbox
             status={remember ? 'checked' : 'unchecked'}
             onPress={() => setRemember(!remember)}
-            color="#ff5252"
+            color="#fc9355"
           />
           <Text style={styles.rememberText}>Remember</Text>
         </View>
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   forgotText: {
     fontFamily: 'Montserrat-Regular',
     fontSize: 14,
-    color: '#ff5252',
+    color: '#fc9355',
   },
   button: {
     marginVertical: 20,

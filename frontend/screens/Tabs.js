@@ -44,7 +44,7 @@ console.log(isPetOwner)
         },
       })}
       tabBarOptions={{
-        activeTintColor: '#ff5252',
+        activeTintColor: '#fc9355',
         inactiveTintColor: 'gray',
       }}
     >
@@ -73,7 +73,7 @@ console.log(isPetOwner)
         },
       })}
       tabBarOptions={{
-        activeTintColor: '#ff5252',
+        activeTintColor: '#fc9355',
         inactiveTintColor: 'gray',
       }}
     >

@@ -136,7 +136,7 @@ const MessageScreen = ({ route, navigation }) => {
   const renderSend = (props) => (
     <Send {...props}>
       <View style={styles.sendingContainer}>
-        <Icon name="send" type="material" color="#FF5252" />
+        <Icon name="send" type="material" color="#fc9355" />
       </View>
     </Send>
   );
@@ -148,7 +148,7 @@ const MessageScreen = ({ route, navigation }) => {
   const renderActions = (props) => (
     <Actions
       {...props}
-      icon={() => <Icon name="camera" type="material" color="#FF5252" />}
+      icon={() => <Icon name="camera" type="material" color="#fc9355" />}
       onPressActionButton={pickImage}
     />
   );
