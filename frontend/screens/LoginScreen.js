@@ -53,7 +53,7 @@ const LoginScreen = () => {
         // Navigate to the main app screen
         navigation.navigate('Tabs', {screen: "Home", isPetOwner: false});
       } else {
-          const response = await fetch(`${API_BASE_URL}petowners`/login, {
+          const response = await fetch(`${API_BASE_URL}petowners/login`, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
