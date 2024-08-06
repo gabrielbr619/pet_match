@@ -17,7 +17,6 @@ const LoginScreen = () => {
   const [remember, setRemember] = useState(false);
   const navigation = useNavigation();
 
-
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: 'YOUR_EXPO_GOOGLE_CLIENT_ID',
     iosClientId: 'YOUR_IOS_GOOGLE_CLIENT_ID',
@@ -54,7 +53,7 @@ const LoginScreen = () => {
         // Navigate to the main app screen
         navigation.navigate('Tabs', {screen: "Home", isPetOwner: false});
       } else {
-          const response = await fetch(`${API_BASE_URL}petowners/login`, {
+          const response = await fetch(`${API_BASE_URL}petowners`/login, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
@@ -95,7 +94,7 @@ const LoginScreen = () => {
     if (response?.type === 'success') {
       const { authentication } = response;
       console.log('Google Authentication Success:', authentication);
-      // Você pode usar a `authentication.accessToken` para chamar a API do Google e obter dados do usuário.
+      // Você pode usar a authentication.accessToken para chamar a API do Google e obter dados do usuário.
     }
   }, [response]);
 
@@ -103,60 +102,59 @@ const LoginScreen = () => {
     if (fbResponse?.type === 'success') {
       const { authentication } = fbResponse;
       console.log('Facebook Authentication Success:', authentication);
-      // Você pode usar a `authentication.accessToken` para chamar a API do Facebook e obter dados do usuário.
+      // Você pode usar a authentication.accessToken para chamar a API do Facebook e obter dados do usuário.
     }
   }, [fbResponse]);
 
+
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/dog_login.png')} style={styles.image} resizeMode="contain" />
-      <Text style={styles.title}>Log in</Text>
-      <Text style={styles.subtitle}>Enter your credentials to proceed</Text>
-      
+      <Image
+        source={require("../assets/svgs/pets_login.svg")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.title}>Login</Text>
+      <Text style={styles.subtitle}>Por favor insira seus dados para acessar</Text>
+
       <TextInput
-        label="Enter your email address"
+        label="Email"
         value={email}
-        onChangeText={text => setEmail(text)}
+        onChangeText={(text) => setEmail(text)}
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
-        left={<TextInput.Icon name="email" />}
+        left={<TextInput.Icon icon="email" color={"#FF914D"} />}
       />
       <TextInput
-        label="Enter your password"
+        label="Password"
         value={password}
-        onChangeText={text => setPassword(text)}
+        onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
-        left={<TextInput.Icon name="lock" />}
-        right={<TextInput.Icon name="eye" />}
+        left={<TextInput.Icon icon="lock" color={"#FF914D"} />}
+
       />
 
-      <View style={styles.rememberContainer}>
-        <View style={styles.rememberSubContainer}>
-          <Checkbox
-            status={remember ? 'checked' : 'unchecked'}
-            onPress={() => setRemember(!remember)}
-            color="#fc9355"
-          />
-          <Text style={styles.rememberText}>Remember</Text>
-        </View>
-        <TouchableOpacity onPress={() => console.log('Forgot Password Pressed')}>
-          <Text style={styles.forgotText}>Forgot your password?</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        style={styles.button}
+      <TouchableOpacity
+        style={styles.forgotContainer}
+        onPress={() => console.log("Forgot Password Pressed")}
       >
-        Log in
+        <Text style={styles.forgotText}>Esqueceu a senha?</Text>
+      </TouchableOpacity>
+
+      <Button mode="contained" onPress={handleLogin} style={styles.button}>
+        Logar
       </Button>
 
-      <Text style={styles.orText}>or</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.signUpText}>
+          Ainda não tem conta? <Text style={styles.signUpLink}>Cadastre-se!</Text>
+        </Text>
+      </TouchableOpacity>
 
-      <View style={styles.socialContainer}>
+      {/* <View style={styles.socialContainer}>
         <SocialIcon
           button
           type="google"
@@ -175,7 +173,8 @@ const LoginScreen = () => {
           onPress={() => console.log('Instagram Login Pressed')}
           style={styles.socialButton}
         />
-      </View>
+      </View> */}
+
     </View>
   );
 };
@@ -183,66 +182,51 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
-  image: {
-    width: '100%',
-    height: 200,
-    marginBottom: 20,
+  logo: {
+    height: 150,
+    width: 150,
+    alignSelf: "center",
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
     fontSize: 28,
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
-    fontFamily: 'Montserrat-Regular',
     fontSize: 16,
-    textAlign: 'center',
-    color: '#888',
-    marginBottom: 20,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 30,
   },
   input: {
     marginBottom: 15,
+    backgroundColor: "#fff",
   },
-  rememberContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  forgotContainer: {
+    alignItems: "flex-end",
     marginBottom: 20,
   },
-  rememberSubContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rememberText: {
-    fontFamily: 'Montserrat-Regular',
-    fontSize: 14,
-    color: '#888',
-  },
   forgotText: {
-    fontFamily: 'Montserrat-Regular',
     fontSize: 14,
-    color: '#fc9355',
+    color: "#FF914D",
   },
   button: {
     marginVertical: 20,
-    backgroundColor: '#FF914D',
+    backgroundColor: "#FF914D",
   },
-  orText: {
-    textAlign: 'center',
-    marginVertical: 10,
+  signUpText: {
+    textAlign: "center",
+    marginTop: 20,
+    color: "#888",
   },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  socialButton: {
-    flex: 1,
-    marginHorizontal: 10,
+  signUpLink: {
+    color: "#FF914D",
+    fontWeight: "bold",
   },
 });
 

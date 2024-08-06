@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const streamifier = require('streamifier');
 const { checkIfAlreadyExists } = require('../helpers/checkIfExists');
 const { uploadSinglePicture } = require('../helpers/uploadPictures');
+const { createChat } = require('../models/Chat');
 
 exports.registerUser = async (req, res) => {
   try {
@@ -72,13 +73,15 @@ exports.getUser = async (req, res) => {
 
 exports.userLikePet = async (req, res) => {
   try {
-    const { user, pet_id} = req.body;
-    const updatedUser = await likePet(user, pet_id)
-    res.status(201).json(updatedUser);
+    const { user_data, pet_id, pet_owner_id} = req.body;
+    const updatedUser = await likePet(user_data, pet_id)
+    const chatCreated = await createChat(user_data.id, pet_owner_id, pet_id)
+    res.status(201).json({updatedUser, chatCreated});
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 }
+
 
 exports.userDeslikePet = async (req, res) => {
   try {

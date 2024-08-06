@@ -7,7 +7,6 @@ import { API_BASE_URL } from '../App';
 const ChatsScreen = ({ navigation }) => {
   const [userData, setUserData] = useState({});
   const [userToken, setUserToken] = useState(null);
-
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,7 +43,9 @@ const ChatsScreen = ({ navigation }) => {
       });
 
       const data = await response.json();
-      setChats(data); // Assuming the API returns an array of chats
+      if (Array.isArray(data)) {
+        setChats(data); // Assuming the API returns an array of chats
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching chats:', error);
@@ -53,7 +54,7 @@ const ChatsScreen = ({ navigation }) => {
   };
 
   const renderChatItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('Message', { chatId: item.chat_id, userData, userToken, pet_owner: item.pet_owner, pet: item.pet  })}>
+    <TouchableOpacity onPress={() => navigation.navigate('Message', { chatId: item.chat_id, userData, userToken, pet_owner: item.pet_owner, pet: item.pet })}>
       <ListItem bottomDivider>
         <Avatar rounded source={{ uri: item.pet.pictures[0] }} />
         <ListItem.Content>
@@ -85,11 +86,17 @@ const ChatsScreen = ({ navigation }) => {
           <Icon name="settings" type="material" size={30} />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={chats}
-        renderItem={renderChatItem}
-        keyExtractor={(item) => item.chat_id.toString()}
-      />
+      {chats.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Nenhum chat encontrado.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={chats}
+          renderItem={renderChatItem}
+          keyExtractor={(item) => item.chat_id ? item.chat_id.toString() : Math.random().toString()}
+        />
+      )}
     </View>
   );
 };
@@ -114,6 +121,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#888',
   },
 });
 

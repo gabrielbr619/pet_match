@@ -58,23 +58,14 @@ const HomeScreen = ({ navigation }) => {
 
   const handleLike = async () => {
     try {
-      await fetch('API_BASE_URLusers/likePet', {
+      await fetch(`${API_BASE_URL}users/likePet`, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${userToken}`,
         },
-        body: JSON.stringify({ userData, petId: pet.id }),
-      });
-      await fetch('API_BASE_URLchats/', {
-        method: 'PUT',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({ userId: userData.id, petId: pet.id, petOwnerId: pet.owner_id }),
+        body: JSON.stringify({ user_data: userData, pet_id: pet.id, pet_owner_id: pet.owner_id}),
       });
       fetchPet(userData.id); // Fetch a new pet after liking
     } catch (error) {
