@@ -1,43 +1,43 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
-import { SocialIcon } from 'react-native-elements';
-import * as Google from 'expo-auth-session/providers/google';
-import * as Facebook from 'expo-auth-session/providers/facebook';
-import * as WebBrowser from 'expo-web-browser';
-import { API_BASE_URL } from '../App';
+import React, { useState } from "react";
+import { View, StyleSheet, Text, Image } from "react-native";
+import { TextInput, Button } from "react-native-paper";
+import { SocialIcon } from "react-native-elements";
+import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from "expo-auth-session/providers/facebook";
+import * as WebBrowser from "expo-web-browser";
+import { API_BASE_URL } from "../App";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: 'YOUR_EXPO_GOOGLE_CLIENT_ID',
-    iosClientId: 'YOUR_IOS_GOOGLE_CLIENT_ID',
-    androidClientId: 'YOUR_ANDROID_GOOGLE_CLIENT_ID',
-    webClientId: 'YOUR_WEB_GOOGLE_CLIENT_ID',
+    expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
+    iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
+    androidClientId: "YOUR_ANDROID_GOOGLE_CLIENT_ID",
+    webClientId: "YOUR_WEB_GOOGLE_CLIENT_ID",
   });
 
   const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-    clientId: 'YOUR_FACEBOOK_APP_ID',
+    clientId: "YOUR_FACEBOOK_APP_ID",
   });
 
   const handleRegister = () => {
-    fetch(`${API_BASE_URL}users/register`,{
-      method: 'POST',
+    fetch(`${API_BASE_URL}users/register`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         username,
         password,
         email,
       }),
-    })
-    console.log('Registering', { username, password, email });
+    });
+    console.log("Registering", { username, password, email });
   };
 
   const handleGoogleLogin = () => {
@@ -49,55 +49,68 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   React.useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const { authentication } = response;
-      console.log('Google Authentication Success:', authentication);
-      // Você pode usar a `authentication.accessToken` para chamar a API do Google e obter dados do usuário.
+      console.log("Google Authentication Success:", authentication);
     }
   }, [response]);
 
   React.useEffect(() => {
-    if (fbResponse?.type === 'success') {
+    if (fbResponse?.type === "success") {
       const { authentication } = fbResponse;
-      console.log('Facebook Authentication Success:', authentication);
-      // Você pode usar a `authentication.accessToken` para chamar a API do Facebook e obter dados do usuário.
+      console.log("Facebook Authentication Success:", authentication);
     }
   }, [fbResponse]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome!</Text>
-      <Text style={styles.subtitle}>Join us to find your perfect furry friend.</Text>
-      
+      <Image
+        source={require("../assets/svgs/adopting_dog.svg")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.title}>Bem vindo!</Text>
+      <Text style={styles.subtitle}>
+        Venha encontrar seu próximo melhor amigo.
+      </Text>
+
       <TextInput
         label="Username"
         value={username}
-        onChangeText={text => setUsername(text)}
+        onChangeText={(text) => setUsername(text)}
         style={styles.input}
+        mode="flat"
+        left={<TextInput.Icon icon="account-circle" color={"#FF914D"} />}
       />
       <TextInput
         label="Password"
         value={password}
-        onChangeText={text => setPassword(text)}
+        onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
+        left={<TextInput.Icon icon="lock" color={"#FF914D"} />}
       />
       <TextInput
-        label="Enter email"
+        label="Email"
         value={email}
-        onChangeText={text => setEmail(text)}
+        onChangeText={(text) => setEmail(text)}
         style={styles.input}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        left={<TextInput.Icon icon="email" color={"#FF914D"} />}
       />
 
       <Button
         mode="contained"
         onPress={handleRegister}
         style={styles.button}
+        labelStyle={styles.buttonText}
       >
         Create
       </Button>
 
-      <Text style={styles.orText}>or connect with</Text>
+      <Text style={styles.orText}>Ou acesse com</Text>
 
       <View style={styles.socialContainer}>
         <SocialIcon
@@ -105,14 +118,14 @@ const RegisterScreen = ({ navigation }) => {
           button
           type="google"
           onPress={handleGoogleLogin}
-          style={styles.socialButton}
+          style={styles.socialButtonGoogle}
         />
         <SocialIcon
           title="Facebook"
           button
           type="facebook"
           onPress={handleFacebookLogin}
-          style={styles.socialButton}
+          style={styles.socialButtonFacebook}
         />
       </View>
     </View>
@@ -122,38 +135,61 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+  },
+  logo: {
+    height: 150,
+    width: 150,
+    alignSelf: "center",
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
-    textAlign: 'center',
-    marginBottom: 20,
+    fontSize: 16,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 30,
   },
   input: {
     marginBottom: 15,
+    backgroundColor: "#fff",
   },
   button: {
     marginVertical: 20,
-    backgroundColor: '#FF914D',
+    backgroundColor: "#FF914D",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
   },
   orText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginVertical: 10,
+    color: "#000",
   },
   socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
-  socialButton: {
+  socialButtonGoogle: {
     flex: 1,
     marginHorizontal: 10,
+    backgroundColor: "#de5246",
+    borderRadius: 20,
+  },
+  socialButtonFacebook: {
+    flex: 1,
+    marginHorizontal: 10,
+    backgroundColor: "#4267B2",
+    borderRadius: 20,
   },
 });
 

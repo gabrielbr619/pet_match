@@ -3,29 +3,11 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Button, CheckBox, Icon, Input, Slider } from "react-native-elements";
 
-const SearchScreen = ({ navigation }) => {
+const SearchScreen = ({ navigation, userData, userToken }) => {
   const [selectedPet, setSelectedPet] = useState(null);
   const [selectedGender, setSelectedGender] = useState(null);
   const [petSize, setPetSize] = useState(50);
   const [location, setLocation] = useState("");
-
-  const [userData, setUserData] = useState({});
-
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const getUser = async () => {
-    try {
-      const userData = await AsyncStorage.getItem("user");
-      const userDataParsed = JSON.parse(userData);
-      //   const token = await AsyncStorage.getItem('userToken');
-      //   setUserToken(token);
-      setUserData(userDataParsed);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
 
   const handleSearch = () => {
     console.log({

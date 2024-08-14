@@ -1,40 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image, Alert } from 'react-native';
-import { TextInput, Button, Checkbox } from 'react-native-paper';
-import { SocialIcon } from 'react-native-elements';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Google from 'expo-auth-session/providers/google';
-import * as Facebook from 'expo-auth-session/providers/facebook';
-import * as WebBrowser from 'expo-web-browser';
-import { useNavigation } from '@react-navigation/native';
-import { API_BASE_URL } from '../App';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
+import { TextInput, Button, Checkbox } from "react-native-paper";
+import { SocialIcon } from "react-native-elements";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from "expo-auth-session/providers/facebook";
+import * as WebBrowser from "expo-web-browser";
+import { useNavigation } from "@react-navigation/native";
+import { API_BASE_URL } from "../App";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const navigation = useNavigation();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: 'YOUR_EXPO_GOOGLE_CLIENT_ID',
-    iosClientId: 'YOUR_IOS_GOOGLE_CLIENT_ID',
-    androidClientId: 'YOUR_ANDROID_GOOGLE_CLIENT_ID',
-    webClientId: 'YOUR_WEB_GOOGLE_CLIENT_ID',
+    expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
+    iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
+    androidClientId: "YOUR_ANDROID_GOOGLE_CLIENT_ID",
+    webClientId: "YOUR_WEB_GOOGLE_CLIENT_ID",
   });
 
   const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-    clientId: 'YOUR_FACEBOOK_APP_ID',
+    clientId: "YOUR_FACEBOOK_APP_ID",
   });
 
   const handleLogin = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}users/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email,
@@ -47,38 +54,41 @@ const LoginScreen = () => {
 
       if (response.ok) {
         // Store the data using AsyncStorage
-        await AsyncStorage.setItem('userToken', data.token);
-        await AsyncStorage.setItem('user', JSON.stringify(data.user));
+        await AsyncStorage.setItem("userToken", data.token);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
 
         // Navigate to the main app screen
-        navigation.navigate('Tabs', {screen: "Home", isPetOwner: false});
+        navigation.navigate("Tabs", {
+          screen: "Home",
+          params: { isPetOwner: false },
+        });
       } else {
-          const response = await fetch(`${API_BASE_URL}petowners/login`, {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              remember,
-            }),
-          });
-    
-          const data = await response.json();
-          if (response.ok) {
-            // Store the data using AsyncStorage
-            await AsyncStorage.setItem('userToken', data.token);
-            await AsyncStorage.setItem('user', JSON.stringify(data.owner));
-    
-            // Navigate to the main app screen
-            navigation.navigate('Tabs', {screen: "Chat", isPetOwner: true});
-          }
+        const response = await fetch(`${API_BASE_URL}petowners/login`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            remember,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          // Store the data using AsyncStorage
+          await AsyncStorage.setItem("userToken", data.token);
+          await AsyncStorage.setItem("user", JSON.stringify(data.owner));
+
+          // Navigate to the main app screen
+          navigation.navigate("Tabs", { screen: "Chat", isPetOwner: true });
+        }
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Login Error', 'An error occurred. Please try again.');
+      Alert.alert("Login Error", "An error occurred. Please try again.");
     }
   };
 
@@ -91,32 +101,33 @@ const LoginScreen = () => {
   };
 
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const { authentication } = response;
-      console.log('Google Authentication Success:', authentication);
+      console.log("Google Authentication Success:", authentication);
       // Você pode usar a authentication.accessToken para chamar a API do Google e obter dados do usuário.
     }
   }, [response]);
 
   useEffect(() => {
-    if (fbResponse?.type === 'success') {
+    if (fbResponse?.type === "success") {
       const { authentication } = fbResponse;
-      console.log('Facebook Authentication Success:', authentication);
+      console.log("Facebook Authentication Success:", authentication);
       // Você pode usar a authentication.accessToken para chamar a API do Facebook e obter dados do usuário.
     }
   }, [fbResponse]);
 
-
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/svgs/pets_login.svg")}
+        source={require("../assets/svgs/woman_playing_with_dog.svg")}
         style={styles.logo}
         resizeMode="contain"
       />
 
       <Text style={styles.title}>Login</Text>
-      <Text style={styles.subtitle}>Por favor insira seus dados para acessar</Text>
+      <Text style={styles.subtitle}>
+        Por favor insira seus dados para acessar
+      </Text>
 
       <TextInput
         label="Email"
@@ -134,7 +145,6 @@ const LoginScreen = () => {
         secureTextEntry
         style={styles.input}
         left={<TextInput.Icon icon="lock" color={"#FF914D"} />}
-
       />
 
       <TouchableOpacity
@@ -148,9 +158,10 @@ const LoginScreen = () => {
         Logar
       </Button>
 
-      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
         <Text style={styles.signUpText}>
-          Ainda não tem conta? <Text style={styles.signUpLink}>Cadastre-se!</Text>
+          Ainda não tem conta?{" "}
+          <Text style={styles.signUpLink}>Cadastre-se!</Text>
         </Text>
       </TouchableOpacity>
 
@@ -174,7 +185,6 @@ const LoginScreen = () => {
           style={styles.socialButton}
         />
       </View> */}
-
     </View>
   );
 };

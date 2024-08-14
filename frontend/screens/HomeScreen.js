@@ -9,27 +9,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../App";
 
-const HomeScreen = ({ navigation }) => {
-  const [userData, setUserData] = useState({});
-  const [userToken, setUserToken] = useState(null);
+const HomeScreen = ({ navigation, userData, userToken }) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const userData = await AsyncStorage.getItem("user");
-      const userDataParsed = JSON.parse(userData);
-
-      const token = await AsyncStorage.getItem("userToken");
-
-      setUserToken(token);
-      setUserData(userDataParsed);
-    };
-    getUser();
-  }, []);
 
   useEffect(() => {
     if (userData.id) {
@@ -59,13 +43,17 @@ const HomeScreen = ({ navigation }) => {
   const handleLike = async () => {
     try {
       await fetch(`${API_BASE_URL}users/likePet`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          Accept: "application/json",
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userToken}`,
         },
-        body: JSON.stringify({ user_data: userData, pet_id: pet.id, pet_owner_id: pet.owner_id}),
+        body: JSON.stringify({
+          user_data: userData,
+          pet_id: pet.id,
+          pet_owner_id: pet.owner_id,
+        }),
       });
       fetchPet(userData.id); // Fetch a new pet after liking
     } catch (error) {
@@ -98,16 +86,26 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   }
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Icon name="user-circle" type="font-awesome" size={40} color={"#FFF"} />
+          <Icon
+            name="user-circle"
+            type="font-awesome"
+            size={40}
+            color={"#FFF"}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Pets</Text>
         <TouchableOpacity>
-          <Icon name="user-circle" type="font-awesome" size={40} color={"#fc9355"} />
+          <Icon
+            name="user-circle"
+            type="font-awesome"
+            size={40}
+            color={"#fc9355"}
+          />
         </TouchableOpacity>
       </View>
       <View style={styles.card}>
@@ -190,7 +188,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
-    color:"#FFF"
+    color: "#FFF",
   },
   card: {
     flex: 1,
@@ -234,7 +232,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width:"100%"
+    width: "100%",
   },
   actionButton: {
     padding: 10,

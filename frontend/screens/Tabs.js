@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,31 +7,53 @@ import ProfileScreen from "./ProfileScreen";
 import ChatsScreen from "./ChatsScreen";
 import MessageScreen from "./MessageScreen";
 import SearchScreen from "./SearchScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function ChatStack() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="ChatsStack"
-        component={ChatsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Message"
-        component={MessageScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
-}
-
 export default function Tabs({ isPetOwner }) {
-  console.log(isPetOwner);
+  const [userData, setUserData] = useState({});
+  const [userToken, setUserToken] = useState(null);
+
+  const ChatStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="ChatsStack" options={{ headerShown: false }}>
+          {(props) => (
+            <ChatsScreen {...props} userData={userData} userToken={userToken} />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="Message" options={{ headerShown: false }}>
+          {(props) => (
+            <MessageScreen
+              {...props}
+              userData={userData}
+              userToken={userToken}
+            />
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    );
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      const userDataParsed = JSON.parse(userData);
+      const token = await AsyncStorage.getItem("userToken");
+      setUserToken(token);
+      setUserData(userDataParsed);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   if (isPetOwner) {
-    console.log("entrou aq");
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -58,19 +80,36 @@ export default function Tabs({ isPetOwner }) {
       >
         <Tab.Screen
           name="Chats"
-          component={ChatStack}
           options={{ headerShown: false, tabBarShowLabel: false }}
-        />
+        >
+          {(props) => (
+            <ChatStack {...props} userData={userData} userToken={userToken} />
+          )}
+        </Tab.Screen>
         <Tab.Screen
           name="Profile"
-          component={ProfileScreen}
           options={{ headerShown: false, tabBarShowLabel: false }}
-        />
+        >
+          {(props) => (
+            <ProfileScreen
+              {...props}
+              userData={userData}
+              userToken={userToken}
+            />
+          )}
+        </Tab.Screen>
         <Tab.Screen
           name="Search"
-          component={SearchScreen}
           options={{ headerShown: false, tabBarShowLabel: false }}
-        />
+        >
+          {(props) => (
+            <SearchScreen
+              {...props}
+              userData={userData}
+              userToken={userToken}
+            />
+          )}
+        </Tab.Screen>
       </Tab.Navigator>
     );
   }
@@ -100,24 +139,36 @@ export default function Tabs({ isPetOwner }) {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
         options={{ headerShown: false, tabBarShowLabel: false }}
-      />
+      >
+        {(props) => (
+          <HomeScreen {...props} userData={userData} userToken={userToken} />
+        )}
+      </Tab.Screen>
       <Tab.Screen
         name="Search"
-        component={SearchScreen}
         options={{ headerShown: false, tabBarShowLabel: false }}
-      />
+      >
+        {(props) => (
+          <SearchScreen {...props} userData={userData} userToken={userToken} />
+        )}
+      </Tab.Screen>
       <Tab.Screen
         name="Chats"
-        component={ChatStack}
         options={{ headerShown: false, tabBarShowLabel: false }}
-      />
+      >
+        {(props) => (
+          <ChatStack {...props} userData={userData} userToken={userToken} />
+        )}
+      </Tab.Screen>
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
         options={{ headerShown: false, tabBarShowLabel: false }}
-      />
+      >
+        {(props) => (
+          <ProfileScreen {...props} userData={userData} userToken={userToken} />
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
