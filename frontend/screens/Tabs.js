@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "./HomeScreen";
+import HomeScreen from "./user/HomeScreen";
 import ProfileScreen from "./ProfileScreen";
 import ChatsScreen from "./ChatsScreen";
 import MessageScreen from "./MessageScreen";
-import SearchScreen from "./SearchScreen";
+import SearchScreen from "./user/SearchScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();

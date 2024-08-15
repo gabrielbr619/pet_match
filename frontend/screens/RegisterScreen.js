@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text, Image, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { SocialIcon } from "react-native-elements";
 import * as Google from "expo-auth-session/providers/google";
@@ -14,53 +14,54 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
-    iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
-    androidClientId: "YOUR_ANDROID_GOOGLE_CLIENT_ID",
-    webClientId: "YOUR_WEB_GOOGLE_CLIENT_ID",
-  });
+  // const [request, response, promptAsync] = Google.useAuthRequest({
+  //   expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
+  //   iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
+  //   androidClientId: "YOUR_ANDROID_GOOGLE_CLIENT_ID",
+  //   webClientId: "YOUR_WEB_GOOGLE_CLIENT_ID",
+  // });
 
-  const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-    clientId: "YOUR_FACEBOOK_APP_ID",
-  });
+  // const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
+  //   clientId: "YOUR_FACEBOOK_APP_ID",
+  // });
 
   const handleRegister = () => {
-    fetch(`${API_BASE_URL}users/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-      }),
+    // Verifica se algum dos campos está vazio
+    // if (username === "" || password === "" || email === "") {
+    //   return Alert.alert(
+    //     "Erro ao cadastrar",
+    //     "Verifique se todas informações foram inseridas corretamente."
+    //   );
+    // }
+
+    navigation.navigate("PetOwnerOrUserScreen", {
+      username,
+      password,
+      email,
     });
-    console.log("Registering", { username, password, email });
   };
 
-  const handleGoogleLogin = () => {
-    promptAsync();
-  };
+  // const handleGoogleLogin = () => {
+  //   promptAsync();
+  // };
 
-  const handleFacebookLogin = () => {
-    fbPromptAsync();
-  };
+  // const handleFacebookLogin = () => {
+  //   fbPromptAsync();
+  // };
 
-  React.useEffect(() => {
-    if (response?.type === "success") {
-      const { authentication } = response;
-      console.log("Google Authentication Success:", authentication);
-    }
-  }, [response]);
+  // React.useEffect(() => {
+  //   if (response?.type === "success") {
+  //     const { authentication } = response;
+  //     console.log("Google Authentication Success:", authentication);
+  //   }
+  // }, [response]);
 
-  React.useEffect(() => {
-    if (fbResponse?.type === "success") {
-      const { authentication } = fbResponse;
-      console.log("Facebook Authentication Success:", authentication);
-    }
-  }, [fbResponse]);
+  // React.useEffect(() => {
+  //   if (fbResponse?.type === "success") {
+  //     const { authentication } = fbResponse;
+  //     console.log("Facebook Authentication Success:", authentication);
+  //   }
+  // }, [fbResponse]);
 
   return (
     <View style={styles.container}>
@@ -76,7 +77,7 @@ const RegisterScreen = ({ navigation }) => {
       </Text>
 
       <TextInput
-        label="Username"
+        label="Nome de Usuário"
         value={username}
         onChangeText={(text) => setUsername(text)}
         style={styles.input}
@@ -84,7 +85,7 @@ const RegisterScreen = ({ navigation }) => {
         left={<TextInput.Icon icon="account-circle" color={"#FF914D"} />}
       />
       <TextInput
-        label="Password"
+        label="Senha"
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
@@ -107,10 +108,18 @@ const RegisterScreen = ({ navigation }) => {
         style={styles.button}
         labelStyle={styles.buttonText}
       >
-        Create
+        Criar
       </Button>
-
-      <Text style={styles.orText}>Ou acesse com</Text>
+      <Text style={styles.footerText}>
+        Já tem conta?{" "}
+        <Text
+          style={styles.signInText}
+          onPress={() => navigation.navigate("Login")}
+        >
+          Acesse!
+        </Text>
+      </Text>
+      {/* <Text style={styles.orText}>Ou acesse com</Text>
 
       <View style={styles.socialContainer}>
         <SocialIcon
@@ -127,7 +136,7 @@ const RegisterScreen = ({ navigation }) => {
           onPress={handleFacebookLogin}
           style={styles.socialButtonFacebook}
         />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -140,8 +149,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logo: {
-    height: 150,
-    width: 150,
+    height: 180,
+    width: 180,
     alignSelf: "center",
   },
   title: {
@@ -190,6 +199,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: "#4267B2",
     borderRadius: 20,
+  },
+  footerText: {
+    fontFamily: "Montserrat-Regular",
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+  },
+  signInText: {
+    color: "#fc9355",
   },
 });
 

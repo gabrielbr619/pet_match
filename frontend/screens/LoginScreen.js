@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   logo: {
-    height: 150,
-    width: 150,
+    height: 170,
+    width: 220,
     alignSelf: "center",
   },
   title: {
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
   },
   signUpText: {
     textAlign: "center",
-    marginTop: 20,
     color: "#888",
   },
   signUpLink: {

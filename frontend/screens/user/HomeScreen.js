@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { API_BASE_URL } from "../App";
+import { API_BASE_URL } from "../../App";
 
 const HomeScreen = ({ navigation, userData, userToken }) => {
   const [pet, setPet] = useState(null);
