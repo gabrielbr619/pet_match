@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { API_BASE_URL } from "../../App";
+import { API_BASE_URL } from "../../common";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen = ({ navigation, userData, userToken }) => {
   const [pet, setPet] = useState(null);
@@ -88,7 +89,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
           <Icon
@@ -129,27 +130,27 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
                   onPress={handleDislike}
                   style={styles.actionButton}
                 >
-                  <div style={styles.circle}>
+                  <View style={styles.circle}>
                     <Icon
                       name="times"
                       type="font-awesome"
                       size={35}
                       color="#FFFFFF"
                     />
-                  </div>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleLike}
                   style={styles.actionButton}
                 >
-                  <div style={styles.circle}>
+                  <View style={styles.circle}>
                     <Icon
                       name="heart"
                       type="font-awesome"
                       size={30}
                       color="#FFFFFF"
                     />
-                  </div>
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -162,7 +163,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
         <Icon name="comments" type="font-awesome" size={30} onPress={() => navigation.navigate('Chats')} />
         <Icon name="user" type="font-awesome" size={30} onPress={() => navigation.navigate('Profile')} />
       </View> */}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -197,7 +198,10 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 10,
     backgroundColor: "#ffffff",
-    boxShadow: "0px 2px 4px rgba(0,0,0,0.08)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     width: "90%",
   },
   cardInfo: {
@@ -210,7 +214,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     borderRadius: 10,
-    margin: "-20",
     marginBottom: 20,
   },
   petName: {
@@ -246,11 +249,10 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   circle: {
-    width: "55px",
-    height: "55px",
+    width: 55,
+    height: 55,
     backgroundColor: "#fc9355",
-    borderRadius: "50%",
-    display: "flex",
+    borderRadius: 27.5, // Half of width/height for a circle
     justifyContent: "center",
     alignItems: "center",
   },

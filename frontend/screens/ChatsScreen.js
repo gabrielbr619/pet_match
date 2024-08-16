@@ -9,19 +9,44 @@ import {
 } from "react-native";
 import { ListItem, Avatar, Icon } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_BASE_URL } from "../App";
+import { API_BASE_URL } from "../common";
+import { useFocusEffect } from "@react-navigation/native";
+import moment from "moment";
+import "moment/locale/pt-br"; // Importa o locale em Português do Brasil
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const ChatsScreen = ({ navigation, userData, userToken }) => {
+const ChatsScreen = ({ navigation }) => {
+  const [userData, setUserData] = useState({});
+  const [userToken, setUserToken] = useState(null);
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userData.id) {
-      fetchChats(userData.id);
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      const userDataParsed = JSON.parse(userData);
+      const token = await AsyncStorage.getItem("userToken");
+      setUserToken(token);
+      setUserData(userDataParsed);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
-  }, [userData]);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData.id) {
+        fetchChats(userData.id);
+      }
+    }, [userData])
+  );
 
   const fetchChats = async (userId) => {
+    setLoading(true);
     try {
       const response = await fetch(
         `${API_BASE_URL}chats/GetUserChats/${userId}`,
@@ -45,6 +70,18 @@ const ChatsScreen = ({ navigation, userData, userToken }) => {
     }
   };
 
+  const formatDate = (dateString) => {
+    const date = moment(dateString);
+
+    if (date.isSame(moment(), "day")) {
+      return date.format("HH:mm");
+    } else if (date.isSame(moment().subtract(1, "day"), "day")) {
+      return "Ontem";
+    } else {
+      return date.format("ddd");
+    }
+  };
+
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
       onPress={() =>
@@ -58,12 +95,16 @@ const ChatsScreen = ({ navigation, userData, userToken }) => {
       }
     >
       <ListItem bottomDivider>
-        <Avatar rounded source={{ uri: item.pet.pictures[0] }} />
+        <Avatar
+          rounded
+          source={{ uri: item.pet.pictures[0] }}
+          icon={{ name: "paw", type: "font-awesome" }}
+        />
         <ListItem.Content>
           <ListItem.Title>{item.pet.name}</ListItem.Title>
           <ListItem.Subtitle>{item.last_message?.content}</ListItem.Subtitle>
         </ListItem.Content>
-        {/* <Text>{item.created_at}</Text> */}
+        <Text>{formatDate(item.last_message?.created_at)}</Text>
       </ListItem>
     </TouchableOpacity>
   );
@@ -78,7 +119,7 @@ const ChatsScreen = ({ navigation, userData, userToken }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
@@ -101,7 +142,7 @@ const ChatsScreen = ({ navigation, userData, userToken }) => {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 

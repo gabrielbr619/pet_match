@@ -5,7 +5,7 @@ import { SocialIcon } from "react-native-elements";
 import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as WebBrowser from "expo-web-browser";
-import { API_BASE_URL } from "../App";
+import { API_BASE_URL } from "../common";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -82,7 +82,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={(text) => setUsername(text)}
         style={styles.input}
         mode="flat"
-        left={<TextInput.Icon icon="account-circle" color={"#FF914D"} />}
+        left={<TextInput.Icon icon="account-circle" color="#FF914D" />}
       />
       <TextInput
         label="Senha"
@@ -90,7 +90,7 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
-        left={<TextInput.Icon icon="lock" color={"#FF914D"} />}
+        left={<TextInput.Icon icon="lock" color="#FF914D" />}
       />
       <TextInput
         label="Email"
@@ -99,7 +99,7 @@ const RegisterScreen = ({ navigation }) => {
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
-        left={<TextInput.Icon icon="email" color={"#FF914D"} />}
+        left={<TextInput.Icon icon="email" color="#FF914D" />}
       />
 
       <Button

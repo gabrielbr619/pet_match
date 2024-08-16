@@ -8,15 +8,9 @@ import LoginScreen from "./screens/LoginScreen";
 import Tabs from "./screens/Tabs";
 import { View, Text, Platform } from "react-native";
 import PetOwnerOrUserScreen from "./screens/PetOwnerOrUserScreen";
+import { API_BASE_URL } from "./common";
 
 const Stack = createStackNavigator();
-
-const LOCALHOST =
-  Platform.OS === "ios" || "android"
-    ? "http://localhost:3000"
-    : "http://192.168.68.106:3000";
-console.log(Platform.OS);
-export const API_BASE_URL = LOCALHOST + "/api/";
 
 const App = () => {
   const [userToken, setUserToken] = useState(null);

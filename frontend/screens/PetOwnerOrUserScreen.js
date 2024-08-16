@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { Button } from "react-native-paper";
-import { API_BASE_URL } from "../App";
+import { API_BASE_URL } from "../common";
 
 const PetOwnerOrUserScreen = ({ route, navigation }) => {
   const { username, password, email } = route.params; // Recebe os props

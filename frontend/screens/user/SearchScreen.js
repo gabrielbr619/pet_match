@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Button, CheckBox, Icon, Input, Slider } from "react-native-elements";
 
+import { API_BASE_URL } from "../../common";
+
 const SearchScreen = ({ navigation, userData, userToken }) => {
   const [selectedPet, setSelectedPet] = useState(null);
   const [selectedGender, setSelectedGender] = useState(null);
@@ -84,9 +86,9 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
         maximumTrackTintColor="#fc9355"
         style={styles.slider}
       />
-      <Text
-        style={styles.sizeText}
-      >{`Tamanho: ${Math.round(petSize)} cm`}</Text>
+      <Text style={styles.sizeText}>{`Tamanho: ${Math.round(
+        petSize
+      )} cm`}</Text>
 
       <Text style={styles.subtitle}>
         Compartilhe sua localização para encontrar pets próximos

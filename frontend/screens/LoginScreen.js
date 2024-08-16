@@ -14,7 +14,7 @@ import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as WebBrowser from "expo-web-browser";
 import { useNavigation } from "@react-navigation/native";
-import { API_BASE_URL } from "../App";
+import { API_BASE_URL } from "../common";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -124,9 +124,9 @@ const LoginScreen = () => {
         resizeMode="contain"
       />
 
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Acessar o App</Text>
       <Text style={styles.subtitle}>
-        Por favor insira seus dados para acessar
+        Por favor insira seus dados para entrar no app
       </Text>
 
       <TextInput
@@ -136,15 +136,16 @@ const LoginScreen = () => {
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
-        left={<TextInput.Icon icon="email" color={"#FF914D"} />}
+        left={<TextInput.Icon icon="email" color="#FF914D" />}
       />
+
       <TextInput
-        label="Password"
+        label="Senha"
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
-        left={<TextInput.Icon icon="lock" color={"#FF914D"} />}
+        left={<TextInput.Icon icon="lock" color="#FF914D" />}
       />
 
       <TouchableOpacity
