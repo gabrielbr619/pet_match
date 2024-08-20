@@ -6,7 +6,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import Tabs from "./screens/Tabs";
-import { View, Text, Platform } from "react-native";
+import { View, Text } from "react-native";
 import PetOwnerOrUserScreen from "./screens/PetOwnerOrUserScreen";
 import { API_BASE_URL } from "./common";
 
@@ -14,7 +14,8 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const [userToken, setUserToken] = useState(null);
-  const [isTokenValid, setIsTokenValid] = useState(null); // Mudança para null para diferenciar entre carregando e verificado
+  const [isTokenValid, setIsTokenValid] = useState(null);
+  const [isPetOwner, setIsPetOwner] = useState(false);
 
   useEffect(() => {
     const checkTokenValidity = async (token) => {
@@ -40,12 +41,24 @@ const App = () => {
     };
 
     const getUserToken = async () => {
-      const token = await AsyncStorage.getItem("userToken");
-      setUserToken(token);
-      if (token) {
-        checkTokenValidity(token);
-      } else {
-        setIsTokenValid(false); // Se não há token, setar como inválido
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        const userData = await AsyncStorage.getItem("user");
+        const userDataParsed = JSON.parse(userData);
+
+        setUserToken(token);
+
+        if (userDataParsed.hasOwnProperty("pets")) {
+          setIsPetOwner(true);
+        }
+
+        if (token) {
+          await checkTokenValidity(token);
+        } else {
+          setIsTokenValid(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
     };
 
@@ -72,11 +85,9 @@ const App = () => {
       <Stack.Navigator initialRouteName={isTokenValid ? "Tabs" : "Welcome"}>
         {isTokenValid ? (
           <>
-            <Stack.Screen
-              name="Tabs"
-              component={Tabs}
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+              {(props) => <Tabs {...props} isPetOwner={isPetOwner} />}
+            </Stack.Screen>
           </>
         ) : (
           <>
@@ -100,11 +111,9 @@ const App = () => {
               component={LoginScreen}
               options={{ headerShown: false }}
             />
-            <Stack.Screen
-              name="Tabs"
-              component={Tabs}
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+              {(props) => <Tabs {...props} isPetOwner={isPetOwner} />}
+            </Stack.Screen>
           </>
         )}
       </Stack.Navigator>

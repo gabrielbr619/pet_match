@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "./user/HomeScreen";
+import HomeScreen from "./user/UserHomeScreen";
+import PetOwnerHomeScreen from "./pet_owner/PetOwnerHomeScreen"; // Importe sua nova tela aqui
 import ProfileScreen from "./ProfileScreen";
 import ChatsScreen from "./ChatsScreen";
 import MessageScreen from "./MessageScreen";
-import SearchScreen from "./user/SearchScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
@@ -57,8 +57,6 @@ export default function Tabs({ isPetOwner }) {
 
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Search") {
-            iconName = focused ? "search" : "search-outline";
           } else if (route.name === "Chats") {
             iconName = focused ? "chatbubbles" : "chatbubbles-outline";
           } else if (route.name === "Profile") {
@@ -77,6 +75,18 @@ export default function Tabs({ isPetOwner }) {
       {isPetOwner ? (
         <>
           <Tab.Screen
+            name="Home"
+            options={{ headerShown: false, tabBarShowLabel: false }}
+          >
+            {(props) => (
+              <PetOwnerHomeScreen
+                {...props}
+                userData={userData}
+                userToken={userToken}
+              />
+            )}
+          </Tab.Screen>
+          <Tab.Screen
             name="Chats"
             options={{ headerShown: false, tabBarShowLabel: false }}
           >
@@ -90,18 +100,6 @@ export default function Tabs({ isPetOwner }) {
           >
             {(props) => (
               <ProfileScreen
-                {...props}
-                userData={userData}
-                userToken={userToken}
-              />
-            )}
-          </Tab.Screen>
-          <Tab.Screen
-            name="Search"
-            options={{ headerShown: false, tabBarShowLabel: false }}
-          >
-            {(props) => (
-              <SearchScreen
                 {...props}
                 userData={userData}
                 userToken={userToken}

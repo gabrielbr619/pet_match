@@ -27,12 +27,24 @@ const RegisterScreen = ({ navigation }) => {
 
   const handleRegister = () => {
     // Verifica se algum dos campos está vazio
-    // if (username === "" || password === "" || email === "") {
-    //   return Alert.alert(
-    //     "Erro ao cadastrar",
-    //     "Verifique se todas informações foram inseridas corretamente."
-    //   );
-    // }
+    if (username === "" || password === "" || email === "") {
+      return Alert.alert(
+        "Erro ao cadastrar",
+        "Verifique se todas informações foram inseridas corretamente."
+      );
+    }
+
+    fetch(`${API_BASE_URL}users/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+        email,
+      }),
+    });
 
     navigation.navigate("PetOwnerOrUserScreen", {
       username,

@@ -83,7 +83,10 @@ const LoginScreen = () => {
           await AsyncStorage.setItem("user", JSON.stringify(data.owner));
 
           // Navigate to the main app screen
-          navigation.navigate("Tabs", { screen: "Chat", isPetOwner: true });
+          navigation.navigate("Tabs", {
+            screen: "PetOwnerHomeScreen",
+            isPetOwner: true,
+          });
         }
       }
     } catch (error) {
