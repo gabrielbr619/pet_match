@@ -1,5 +1,3 @@
-
-
 /**
  * @swagger
  * tags:
@@ -23,7 +21,7 @@
  *               - name
  *               - age
  *               - description
- *               - race
+ *               - specie
  *             properties:
  *               name:
  *                 type: string
@@ -31,7 +29,7 @@
  *                 type: integer
  *               description:
  *                 type: string
- *               race:
+ *               specie:
  *                 type: string
  *               pictures:
  *                 type: array
@@ -53,12 +51,11 @@
  *                   type: integer
  *                 description:
  *                   type: string
- *                 race:
+ *                 specie:
  *                   type: string
  *       400:
  *         description: Erro ao adicionar pet
  */
-
 
 /**
  * @swagger
@@ -93,7 +90,7 @@
  *                   type: integer
  *                 description:
  *                   type: string
- *                 race:
+ *                 specie:
  *                   type: string
  *       400:
  *         description: Erro ao remover pet
