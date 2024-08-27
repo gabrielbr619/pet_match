@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Text,
   Image,
-  TouchableOpacity,
+  Pressable,
   Alert,
   ActivityIndicator,
 } from "react-native";
@@ -91,23 +91,23 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <Pressable onPress={() => navigation.navigate("Profile")}>
           <Icon
             name="user-circle"
             type="font-awesome"
             size={40}
             color={"#FFF"}
           />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Pets</Text>
-        <TouchableOpacity>
+        <Pressable>
           <Icon
             name="user-circle"
             type="font-awesome"
             size={40}
             color={"#fc9355"}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <View style={styles.card}>
         {!pet ? (
@@ -119,17 +119,14 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
             <Image
               source={{ uri: pet?.pictures?.length > 0 ? pet.pictures[0] : "" }}
               style={styles.image}
-              resizeMode="cover"
+              contentFit="cover"
             />
             <View style={styles.cardInfo}>
               <Text style={styles.petName}>{`${pet.name}, ${pet.age}`}</Text>
               <Text style={styles.petLocation}>Santos, SP</Text>
               <Text style={styles.petDescription}>{pet.description}</Text>
               <View style={styles.actions}>
-                <TouchableOpacity
-                  onPress={handleDislike}
-                  style={styles.actionButton}
-                >
+                <Pressable onPress={handleDislike} style={styles.actionButton}>
                   <View style={styles.circle}>
                     <Icon
                       name="times"
@@ -138,11 +135,8 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
                       color="#FFFFFF"
                     />
                   </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleLike}
-                  style={styles.actionButton}
-                >
+                </Pressable>
+                <Pressable onPress={handleLike} style={styles.actionButton}>
                   <View style={styles.circle}>
                     <Icon
                       name="heart"
@@ -151,7 +145,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
                       color="#FFFFFF"
                     />
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </>
@@ -198,11 +192,8 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 10,
     backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
     width: "90%",
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.08)",
   },
   cardInfo: {
     padding: 20,

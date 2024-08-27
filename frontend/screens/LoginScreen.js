@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, Text, Pressable, Image, Alert } from "react-native";
 import { TextInput, Button, Checkbox } from "react-native-paper";
 import { SocialIcon } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,6 +8,7 @@ import * as Facebook from "expo-auth-session/providers/facebook";
 import * as WebBrowser from "expo-web-browser";
 import { useNavigation } from "@react-navigation/native";
 import { API_BASE_URL } from "../common";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -56,7 +50,7 @@ const LoginScreen = () => {
         // Store the data using AsyncStorage
         await AsyncStorage.setItem("userToken", data.token);
         await AsyncStorage.setItem("user", JSON.stringify(data.user));
-
+        await AsyncStorage.setItem("isPetOwner", "false");
         // Navigate to the main app screen
         navigation.navigate("Tabs", {
           screen: "Home",
@@ -81,11 +75,10 @@ const LoginScreen = () => {
           // Store the data using AsyncStorage
           await AsyncStorage.setItem("userToken", data.token);
           await AsyncStorage.setItem("user", JSON.stringify(data.owner));
-
+          await AsyncStorage.setItem("isPetOwner", "true");
           // Navigate to the main app screen
           navigation.navigate("Tabs", {
             screen: "PetOwnerHomeScreen",
-            isPetOwner: true,
           });
         }
       }
@@ -124,7 +117,7 @@ const LoginScreen = () => {
       <Image
         source={require("../assets/svgs/woman_playing_with_dog.svg")}
         style={styles.logo}
-        resizeMode="contain"
+        contentFit="contain"
       />
 
       <Text style={styles.title}>Acessar o App</Text>
@@ -139,7 +132,13 @@ const LoginScreen = () => {
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
-        left={<TextInput.Icon icon="email" color="#FF914D" />}
+        left={
+          <TextInput.Icon
+            icon={() => (
+              <MaterialCommunityIcons name="email" size={24} color="#FF914D" />
+            )}
+          />
+        }
       />
 
       <TextInput
@@ -148,26 +147,32 @@ const LoginScreen = () => {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
-        left={<TextInput.Icon icon="lock" color="#FF914D" />}
+        left={
+          <TextInput.Icon
+            icon={() => (
+              <MaterialCommunityIcons name="lock" size={24} color="#FF914D" />
+            )}
+          />
+        }
       />
 
-      <TouchableOpacity
+      <Pressable
         style={styles.forgotContainer}
         onPress={() => console.log("Forgot Password Pressed")}
       >
         <Text style={styles.forgotText}>Esqueceu a senha?</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <Button mode="contained" onPress={handleLogin} style={styles.button}>
         Logar
       </Button>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+      <Pressable onPress={() => navigation.navigate("Register")}>
         <Text style={styles.signUpText}>
           Ainda não tem conta?{" "}
           <Text style={styles.signUpLink}>Cadastre-se!</Text>
         </Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* <View style={styles.socialContainer}>
         <SocialIcon

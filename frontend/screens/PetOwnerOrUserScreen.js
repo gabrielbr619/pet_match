@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { Button } from "react-native-paper";
 import { API_BASE_URL } from "../common";
@@ -58,7 +58,7 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
       </Text>
 
       <View style={styles.optionContainer}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => setUserRole("users")}
           style={styles.radioContainer}
         >
@@ -75,9 +75,9 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
               preciso!
             </Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           onPress={() => setUserRole("petowners")}
           style={styles.radioContainer}
         >
@@ -94,7 +94,7 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
               pet!
             </Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       <Button
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 200,
-    resizeMode: "contain",
+    contentFit: "contain",
     marginBottom: 20,
   },
   title: {

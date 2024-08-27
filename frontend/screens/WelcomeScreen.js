@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Dimensions, Text, TouchableOpacity } from 'react-native';
-import { Image } from 'expo-image';
-import * as Font from 'expo-font';
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Dimensions, Text, Pressable } from "react-native";
+import { Image } from "expo-image";
+import * as Font from "expo-font";
 
 const loadFonts = () => {
   return Font.loadAsync({
-    'Montserrat-Regular': require('../assets/fonts/Montserrat-Regular.ttf'),
-    'Montserrat-Bold': require('../assets/fonts/Montserrat-Bold.ttf'),
+    "Montserrat-Regular": require("../assets/fonts/Montserrat-Regular.ttf"),
+    "Montserrat-Bold": require("../assets/fonts/Montserrat-Bold.ttf"),
   });
 };
 
 export default function WelcomeScreen({ navigation }) {
-  const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
+  const windowWidth = Dimensions.get("window").width;
+  const windowHeight = Dimensions.get("window").height;
 
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
@@ -27,13 +27,28 @@ export default function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Encontre seu parceiro</Text>
-      <Text style={styles.subtitle}>Descubra pets adoráveis buscando adoção.</Text>
-      <Image source={require('../assets/svgs/girl_playing_with_dog.svg')} style={styles.image} resizeMode="contain" />
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
+      <Text style={styles.subtitle}>
+        Descubra pets adoráveis buscando adoção.
+      </Text>
+      <Image
+        source={require("../assets/svgs/girl_playing_with_dog.svg")}
+        style={styles.image}
+        contentFit="contain"
+      />
+      <Pressable
+        style={styles.button}
+        onPress={() => navigation.navigate("Register")}
+      >
         <Text style={styles.buttonText}>Quero começar!</Text>
-      </TouchableOpacity>
+      </Pressable>
       <Text style={styles.footerText}>
-        Já tem conta? <Text style={styles.signInText} onPress={() => navigation.navigate('Login')}>Acesse!</Text>
+        Já tem conta?{" "}
+        <Text
+          style={styles.signInText}
+          onPress={() => navigation.navigate("Login")}
+        >
+          Acesse!
+        </Text>
       </Text>
     </View>
   );
@@ -42,31 +57,31 @@ export default function WelcomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: "Montserrat-Bold",
     fontSize: 28,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: "Montserrat-Regular",
     fontSize: 16,
-    textAlign: 'center',
-    color: '#888',
+    textAlign: "center",
+    color: "#888",
     marginBottom: 20,
   },
   image: {
-    width: '80%',
+    width: "80%",
     height: 200,
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#fc9355',
+    backgroundColor: "#fc9355",
     width: 300,
     paddingVertical: 15,
     paddingHorizontal: 30,
@@ -74,18 +89,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: "Montserrat-Bold",
     fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   footerText: {
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: "Montserrat-Regular",
     fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
+    color: "#888",
+    textAlign: "center",
   },
   signInText: {
-    color: '#fc9355',
+    color: "#fc9355",
   },
 });

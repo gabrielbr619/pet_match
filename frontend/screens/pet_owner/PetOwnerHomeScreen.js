@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { Icon } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { API_BASE_URL } from "../../common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Avatar from "../../components/Avatar";
+import { ActivityIndicator } from "react-native-paper";
 
 const PetOwnerHomeScreen = ({ userData, userToken }) => {
   const navigation = useNavigation();
   const [petList, setPetList] = useState(userData.pets || []);
+  const [loading, setLoading] = useState(true);
 
   const fetchPetOwnerPets = async (userId) => {
     try {
@@ -31,8 +27,10 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
       );
       const data = await response.json();
       setPetList(data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching pets:", error);
+      setLoading(false);
     }
   };
 
@@ -42,18 +40,33 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
     }
   }, [userData]);
 
+  // Usar useFocusEffect para atualizar a lista de pets sempre que a tela ganhar foco
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData.id) {
+        fetchPetOwnerPets(userData.id);
+      }
+    }, [userData.id])
+  );
+
+  const handleEditPet = (pet) => {
+    console.log(pet);
+    navigation.navigate("EditPet", { petData: pet, userToken });
+  };
+
   const renderPet = ({ item }) => (
-    <View style={styles.petContainer}>
+    <Pressable style={styles.petContainer} onPress={() => handleEditPet(item)}>
       <Avatar
         rounded
         size={250}
         containerStyle={styles.avatarContainer}
         avatarStyle={
-          item.pictures.length === 0 ? { backgroundColor: "#BDBDBD" } : null
+          item?.pictures?.length === 0 ? { backgroundColor: "#BDBDBD" } : null
         }
-        source={item.pictures.length > 0 ? { uri: item.pictures[0] } : null}
+        source={item?.pictures?.length > 0 ? { uri: item.pictures[0] } : null}
         icon={{ name: "paw", type: "font-awesome", size: 80 }}
       />
+
       <View style={{ display: "flex", flexDirection: "row" }}>
         <Text style={styles.petName} numberOfLines={2} ellipsizeMode="tail">
           {item.name}
@@ -62,29 +75,38 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
           , {item.age}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF914D" />
+        <Text>Carregando seus Pets...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <Pressable onPress={() => navigation.navigate("Profile")}>
           <Icon
             name="user-circle"
             type="font-awesome"
             size={40}
             color={"#FFF"}
           />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Pets</Text>
-        <TouchableOpacity>
+        <Pressable>
           <Icon
             name="user-circle"
             type="font-awesome"
             size={40}
             color={"#fc9355"}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <FlatList
         data={petList}
@@ -93,15 +115,15 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
         numColumns={2}
         contentContainerStyle={styles.flatListContent}
         ListFooterComponent={() => (
-          <TouchableOpacity
+          <Pressable
             style={styles.addPetContainer}
-            onPress={() => navigation.navigate("AddPetScreen")}
+            onPress={() => handleEditPet({})} // Navegar sem dados para adicionar um novo pet
           >
             <View style={styles.addPetIcon}>
               <Icon name="plus" type="font-awesome" size={40} color={"#FFF"} />
             </View>
             <Text style={styles.addPetLabel}>Adicionar Pet</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       />
     </SafeAreaView>
@@ -109,6 +131,11 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -169,6 +196,11 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     justifyContent: "space-evenly",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

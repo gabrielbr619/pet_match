@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
+import { View, StyleSheet, Pressable, Text, Alert } from "react-native";
 import {
   GiftedChat,
   InputToolbar,
@@ -261,16 +261,16 @@ const MessageScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.headerTitle}>
           <Avatar rounded source={{ uri: pet.pictures[0] }} />
           <Text style={styles.headerText}>{pet_owner.username}</Text>
         </View>
-        <TouchableOpacity>
+        <Pressable>
           <Icon name="settings" type="material" size={30} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <GiftedChat
         messages={messages}

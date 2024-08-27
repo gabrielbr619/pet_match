@@ -6,6 +6,7 @@ import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as WebBrowser from "expo-web-browser";
 import { API_BASE_URL } from "../common";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -80,7 +81,7 @@ const RegisterScreen = ({ navigation }) => {
       <Image
         source={require("../assets/svgs/adopting_dog.svg")}
         style={styles.logo}
-        resizeMode="contain"
+        contentFit="contain"
       />
 
       <Text style={styles.title}>Bem vindo!</Text>
@@ -94,24 +95,39 @@ const RegisterScreen = ({ navigation }) => {
         onChangeText={(text) => setUsername(text)}
         style={styles.input}
         mode="flat"
-        left={<TextInput.Icon icon="account-circle" color="#FF914D" />}
+        left={
+          <TextInput.Icon
+            icon={() => (
+              <MaterialCommunityIcons name="account-circle" color="#FF914D" />
+            )}
+          />
+        }
       />
+
       <TextInput
         label="Senha"
         value={password}
         onChangeText={(text) => setPassword(text)}
         secureTextEntry
         style={styles.input}
-        left={<TextInput.Icon icon="lock" color="#FF914D" />}
+        left={
+          <TextInput.Icon
+            icon={() => <MaterialCommunityIcons name="lock" color="#FF914D" />}
+          />
+        }
       />
       <TextInput
         label="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
         style={styles.input}
-        keyboardType="email-address"
+        inputMode="email"
         autoCapitalize="none"
-        left={<TextInput.Icon icon="email" color="#FF914D" />}
+        left={
+          <TextInput.Icon
+            icon={() => <MaterialCommunityIcons name="email" color="#FF914D" />}
+          />
+        }
       />
 
       <Button

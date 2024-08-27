@@ -3,7 +3,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   Text,
   ActivityIndicator,
 } from "react-native";
@@ -83,7 +83,7 @@ const ChatsScreen = ({ navigation }) => {
   };
 
   const renderChatItem = ({ item }) => (
-    <TouchableOpacity
+    <Pressable
       onPress={() =>
         navigation.navigate("Message", {
           chatId: item.chat_id,
@@ -106,7 +106,7 @@ const ChatsScreen = ({ navigation }) => {
         </ListItem.Content>
         <Text>{formatDate(item.last_message?.created_at)}</Text>
       </ListItem>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   if (loading) {
@@ -121,13 +121,13 @@ const ChatsScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Mensagens</Text>
-        <TouchableOpacity>
+        <Pressable>
           <Icon name="settings" type="material" size={30} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       {chats.length === 0 ? (
         <View style={styles.emptyContainer}>

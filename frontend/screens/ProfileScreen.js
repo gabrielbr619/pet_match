@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   Image,
   Alert,
 } from "react-native";
@@ -101,7 +101,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      <Pressable
         style={styles.profilePictureContainer}
         onPress={handleProfilePicturePress}
       >
@@ -122,7 +122,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
             }}
           />
         </Avatar>
-      </TouchableOpacity>
+      </Pressable>
       <Text style={styles.username}>{username}</Text>
 
       <Text style={styles.label}>Telefone</Text>
@@ -130,7 +130,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
         value={phone}
         onChangeText={setPhone}
         style={styles.input}
-        keyboardType="phone-pad"
+        inputMode="numeric"
       />
 
       <Text style={styles.label}>Endereço</Text>
@@ -141,12 +141,12 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
         placeholder="Av. Puta que pariu - 42"
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
+      <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.saveButtonText}>Salvar alterações</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogoff}>
+      </Pressable>
+      <Pressable style={styles.logoutButton} onPress={handleLogoff}>
         <Text style={styles.logoutButtonText}>Deslogar</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
