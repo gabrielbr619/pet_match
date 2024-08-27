@@ -7,17 +7,20 @@ import {
   Text,
   ActivityIndicator,
 } from "react-native";
-import { ListItem, Avatar, Icon } from "react-native-elements";
+import { ListItem, Icon } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../common";
 import { useFocusEffect } from "@react-navigation/native";
 import moment from "moment";
 import "moment/locale/pt-br"; // Importa o locale em Português do Brasil
 import { SafeAreaView } from "react-native-safe-area-context";
+import Avatar from "../components/Avatar";
 
 const ChatsScreen = ({ navigation }) => {
   const [userData, setUserData] = useState({});
   const [userToken, setUserToken] = useState(null);
+  const [isPetOwner, setIsPetOwner] = useState(null);
+
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,6 +33,10 @@ const ChatsScreen = ({ navigation }) => {
       const userData = await AsyncStorage.getItem("user");
       const userDataParsed = JSON.parse(userData);
       const token = await AsyncStorage.getItem("userToken");
+      const isPetOwner = await AsyncStorage.getItem("isPetOwner");
+      const isPetOwnerParsed = JSON.parse(isPetOwner);
+
+      setIsPetOwner(isPetOwnerParsed);
       setUserToken(token);
       setUserData(userDataParsed);
     } catch (error) {
@@ -49,7 +56,9 @@ const ChatsScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}chats/GetUserChats/${userId}`,
+        `${API_BASE_URL}chats/${
+          isPetOwner ? "getPetOwnerChats" : "getUserChats"
+        }/${userId}`,
         {
           method: "GET",
           headers: {
@@ -82,32 +91,77 @@ const ChatsScreen = ({ navigation }) => {
     }
   };
 
-  const renderChatItem = ({ item }) => (
-    <Pressable
-      onPress={() =>
-        navigation.navigate("Message", {
-          chatId: item.chat_id,
-          userData,
-          userToken,
-          pet_owner: item.pet_owner,
-          pet: item.pet,
-        })
-      }
-    >
-      <ListItem bottomDivider>
-        <Avatar
-          rounded
-          source={{ uri: item.pet.pictures[0] }}
-          icon={{ name: "paw", type: "font-awesome" }}
-        />
-        <ListItem.Content>
-          <ListItem.Title>{item.pet.name}</ListItem.Title>
-          <ListItem.Subtitle>{item.last_message?.content}</ListItem.Subtitle>
-        </ListItem.Content>
-        <Text>{formatDate(item.last_message?.created_at)}</Text>
-      </ListItem>
-    </Pressable>
-  );
+  const renderChatItem = ({ item }) => {
+    console.log(item.user, "IIIIIIIIIIIIIIIIITEEEEEEEEEEEEEEEEM");
+    return (
+      <Pressable
+        onPress={() =>
+          navigation.navigate("Message", {
+            chatId: item.chat_id,
+            userData: item.user,
+            userToken,
+            pet_owner: item.petOwner,
+            pet: item.pet,
+            isPetOwner,
+          })
+        }
+      >
+        {isPetOwner ? (
+          <ListItem bottomDivider>
+            <Avatar
+              rounded
+              source={
+                item?.user?.profile_picture
+                  ? { uri: item.user.profile_picture }
+                  : null
+              }
+              icon={{ name: "user", type: "font-awesome", size: 40 }}
+              containerStyle={styles.avatarContainer}
+              avatarStyle={
+                item?.pictures?.length === 0
+                  ? { backgroundColor: "#BDBDBD" }
+                  : null
+              }
+            />
+
+            <ListItem.Content>
+              <ListItem.Title>{item.user?.username}</ListItem.Title>
+              <ListItem.Subtitle>
+                {item.last_message?.content}
+              </ListItem.Subtitle>
+            </ListItem.Content>
+            <Text>{formatDate(item.last_message?.created_at)}</Text>
+          </ListItem>
+        ) : (
+          <ListItem bottomDivider>
+            <Avatar
+              rounded
+              source={
+                item?.pet?.pictures?.length > 0
+                  ? { uri: item.pet.pictures[0] }
+                  : null
+              }
+              icon={{ name: "paw", type: "font-awesome", size: 40 }}
+              containerStyle={styles.avatarContainer}
+              avatarStyle={
+                item?.pictures?.length === 0
+                  ? { backgroundColor: "#BDBDBD" }
+                  : null
+              }
+            />
+
+            <ListItem.Content>
+              <ListItem.Title>{item.pet.name}</ListItem.Title>
+              <ListItem.Subtitle>
+                {item.last_message?.content}
+              </ListItem.Subtitle>
+            </ListItem.Content>
+            <Text>{formatDate(item.last_message?.created_at)}</Text>
+          </ListItem>
+        )}
+      </Pressable>
+    );
+  };
 
   if (loading) {
     return (
@@ -115,6 +169,35 @@ const ChatsScreen = ({ navigation }) => {
         <ActivityIndicator size="large" color="#fc9355" />
         <Text>Carregando...</Text>
       </View>
+    );
+  }
+
+  if (isPetOwner) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Icon name="arrow-back" type="material" size={30} />
+          </Pressable>
+          <Text style={styles.headerTitle}>Mensagens</Text>
+          <Pressable>
+            <Icon name="settings" type="material" size={30} />
+          </Pressable>
+        </View>
+        {chats.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Nenhum chat encontrado.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={chats}
+            renderItem={renderChatItem}
+            keyExtractor={(item) =>
+              item.chat_id ? item.chat_id.toString() : Math.random().toString()
+            }
+          />
+        )}
+      </SafeAreaView>
     );
   }
 
@@ -171,6 +254,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  avatarContainer: {
+    height: 35,
+    width: 35,
+    borderRadius: 100,
+    marginBottom: 5,
+    marginTop: 5,
   },
   emptyText: {
     fontSize: 18,
