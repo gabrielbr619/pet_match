@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -10,9 +10,11 @@ import {
   Alert,
 } from "react-native";
 import { Avatar, Icon } from "react-native-elements";
-import * as ImagePicker from "react-native-image-picker";
+import * as ImagePicker from "expo-image-picker";
+import PhoneInput from "../components/PhoneInput";
 
 const ProfileScreen = ({ navigation, userData, userToken }) => {
+  const phoneInputRef = useRef(null);
   const [username, setUsername] = useState(userData.username);
   const [phone, setPhone] = useState(userData.phone || "");
   const [address, setAddress] = useState(userData.address || ""); // Endereço não está presente nos dados fornecidos, pode ser atualizado manualmente se necessário.
@@ -21,6 +23,18 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
   );
 
   const handleSaveChanges = () => {
+    const isValid = phoneInputRef.current.isValidNumber();
+
+    if (!isValid) {
+      Alert.alert(
+        "Número de telefone inválido",
+        "Por favor, insira um número de telefone válido."
+      );
+      return;
+    }
+
+    // Continue com o processamento
+    console.log("Número de telefone válido:", phone);
     fetch(`${API_BASE_URL}users/update`, {
       method: "PUT",
       headers: {
@@ -62,7 +76,10 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
 
   const logoff = async () => {
     await AsyncStorage.multiRemove(["userToken", "user"]);
-    navigation.navigate("Welcome");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Welcome" }],
+    });
   };
 
   const handleProfilePicturePress = () => {
@@ -83,20 +100,17 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
     );
   };
 
-  const pickImage = () => {
-    ImagePicker.launchImageLibrary(
-      { mediaType: "photo", selectionLimit: 1 },
-      (response) => {
-        if (response.didCancel) {
-          console.log("User cancelled image picker");
-        } else if (response.errorCode) {
-          console.error("ImagePicker Error: ", response.errorMessage);
-        } else {
-          const selectedImage = response.assets[0]; // Seleciona a primeira imagem (única)
-          setProfilePicture(selectedImage.uri); // Atualiza a imagem de perfil
-        }
-      }
-    );
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfilePicture(result.assets[0].uri);
+    }
   };
 
   return (
@@ -107,7 +121,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
       >
         <Avatar
           size={"xlarge"}
-          source={{ uri: profilePicture }}
+          source={profilePicture ? { uri: profilePicture } : null}
           style={styles.profilePicture}
           rounded
         >
@@ -126,13 +140,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
       <Text style={styles.username}>{username}</Text>
 
       <Text style={styles.label}>Telefone</Text>
-      <TextInput
-        value={phone}
-        onChangeText={setPhone}
-        style={styles.input}
-        inputMode="numeric"
-      />
-
+      <PhoneInput phone={phone} setPhone={setPhone} />
       <Text style={styles.label}>Endereço</Text>
       <TextInput
         value={address}
