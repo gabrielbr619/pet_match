@@ -1,7 +1,13 @@
-const { createChat, getChatByIds, getUserChats } = require('../models/Chat');
-const { selectPetOwnerById } = require('../models/PetOwner');
-const { selectPetById } = require('../models/Pet');
-const { getMessageById } = require('../models/Message');
+const {
+  createChat,
+  getChatByIds,
+  getUserChats,
+  getPetOwnerChats,
+} = require("../models/Chat");
+const { selectPetOwnerById } = require("../models/PetOwner");
+const { selectPetById } = require("../models/Pet");
+const { getMessageById } = require("../models/Message");
+const { findUserById } = require("../models/User");
 
 exports.initiateChat = async (req, res) => {
   try {
@@ -35,13 +41,12 @@ exports.getUserChats = async (req, res) => {
     // Itera sobre cada chat
     for (let i = 0; i < chats.length; i++) {
       const chat = chats[i];
-      
-      // Consulta assíncrona para obter o dono do pet
-      const pet_owner = await selectPetOwnerById(chat.pet_owner_id);
 
-      // Consulta assíncrona para obter o pet
+      const user = await findUserById(chat.user_id);
+      const pet_owner = await selectPetOwnerById(chat.pet_owner_id);
       const pet = await selectPetById(chat.pet_id);
-      console.log(chat)
+
+      console.log(chat);
       const last_message = await getMessageById(chat.last_message_sent);
       console.log(last_message);
       chatsArray.push({
@@ -49,12 +54,52 @@ exports.getUserChats = async (req, res) => {
         created_at: chat.created_at,
         pet_owner,
         pet,
-        last_message: last_message? last_message : null,
+        user,
+        last_message: last_message ? last_message : null,
       });
     }
 
     return res.status(200).json(chatsArray);
-    
+  } catch (error) {
+    console.error("Error fetching user chats:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getPetOwnerChats = async (req, res) => {
+  try {
+    const { id: petOwnerId } = req.params;
+
+    const chatsArray = [];
+
+    // Verifica se o chat já existe
+    const chats = await getPetOwnerChats(petOwnerId);
+
+    if (chats.length === 0) {
+      return res.status(200).json("No Chat found");
+    }
+
+    // Itera sobre cada chat
+    for (let i = 0; i < chats.length; i++) {
+      const chat = chats[i];
+
+      const user = await findUserById(chat.user_id);
+      const petOwner = await selectPetOwnerById(chat.pet_owner_id);
+      const pet = await selectPetById(chat.pet_id);
+
+      const last_message = await getMessageById(chat.last_message_sent);
+
+      chatsArray.push({
+        chat_id: chat.id,
+        created_at: chat.created_at,
+        user,
+        pet,
+        last_message: last_message ? last_message : null,
+        petOwner,
+      });
+    }
+
+    return res.status(200).json(chatsArray);
   } catch (error) {
     console.error("Error fetching user chats:", error);
     return res.status(500).json({ message: "Internal Server Error" });
