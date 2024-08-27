@@ -14,11 +14,20 @@ const selectAllPetOwnerPets = async (petOwnerId) => {
 };
 
 const createPet = async (pet) => {
-  const { name, age, description, race, pictures, owner_id } = pet;
+  const { name, age, description, specie, pictures, owner_id, breed } = pet;
   const id = uuidv4();
   const res = await pool.query(
-    "INSERT INTO Pets (id, name, age, description, race, pictures, owner_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-    [id, name, age, description, race, pictures, owner_id]
+    "INSERT INTO Pets (id, name, age, description, specie, pictures, owner_id, breed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+    [id, name, age, description, specie, pictures, owner_id, breed]
+  );
+  return res.rows[0];
+};
+
+const updatePet = async (pet) => {
+  const { id, name, age, description, specie, pictures, breed } = pet;
+  const res = await pool.query(
+    "UPDATE Pets SET name = $2, age = $3, description = $4, specie = $5, pictures = $6, breed = $7 WHERE id = $1 RETURNING *",
+    [id, name, age, description, specie, pictures, breed]
   );
   return res.rows[0];
 };
@@ -72,6 +81,7 @@ module.exports = {
   selectPetById,
   createPet,
   deletePet,
+  updatePet,
   getRandomPetForUser,
   dislikePet,
   markPetAsViewed,
