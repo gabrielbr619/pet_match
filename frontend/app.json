@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Pet Match",
-    "scheme": "Pet Match",
+    "scheme": "pet-match",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "contentFit": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
@@ -30,4 +30,3 @@
     }
   }
 }
-

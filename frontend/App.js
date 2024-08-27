@@ -32,7 +32,7 @@ const App = () => {
           setIsTokenValid(true);
         } else {
           setIsTokenValid(false);
-          await AsyncStorage.removeItem("userToken"); // Remover token inválido
+          await AsyncStorage.removeItem("userToken");
         }
       } catch (error) {
         console.error("Failed to check token validity:", error);
@@ -44,13 +44,17 @@ const App = () => {
       try {
         const token = await AsyncStorage.getItem("userToken");
         const userData = await AsyncStorage.getItem("user");
-        const userDataParsed = JSON.parse(userData);
 
-        setUserToken(token);
+        if (userData) {
+          const userDataParsed = JSON.parse(userData);
+          setUserToken(token);
 
-        if (userDataParsed.hasOwnProperty("pets")) {
-          setIsPetOwner(true);
+          if (userDataParsed.hasOwnProperty("pets")) {
+            setIsPetOwner(true);
+          }
         }
+
+        setIsTokenValid(false);
 
         if (token) {
           await checkTokenValidity(token);
@@ -59,6 +63,7 @@ const App = () => {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setIsTokenValid(false); // Defina isTokenValid para false em caso de erro
       }
     };
 

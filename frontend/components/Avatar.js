@@ -10,8 +10,6 @@ const Avatar = ({
   source,
   icon,
 }) => {
-  console.log(icon);
-
   return (
     <View
       style={[
