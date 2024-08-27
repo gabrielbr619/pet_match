@@ -9,6 +9,7 @@ import {
   Image,
   Modal,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
@@ -16,14 +17,15 @@ import { Picker } from "@react-native-picker/picker";
 import { dogsBreeds, catBreeds } from "../../assets/jsons/petBreeds";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { API_BASE_URL } from "../../common";
+import SearchablePicker from "react-native-searchable-picker";
 
 const EditPetScreen = ({ route, navigation }) => {
-  const { petData = {}, userToken } = route.params || {};
+  const { petData = {}, userToken, userData } = route.params || {};
 
   const [petName, setPetName] = useState(petData?.name || "");
   const [bio, setBio] = useState(petData?.description || "");
   const [age, setAge] = useState(petData?.age ? petData.age.toString() : "");
-  const [species, setSpecies] = useState(petData?.species || "dog");
+  const [specie, setSpecie] = useState(petData?.specie || "dog");
   const [breed, setBreed] = useState(petData?.breed || "");
   const [pictures, setPictures] = useState(petData?.pictures || []);
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,14 +55,21 @@ const EditPetScreen = ({ route, navigation }) => {
   // Função para salvar as alterações
   const handleSave = async () => {
     try {
+      if (petName === "" || specie === "" || breed === "")
+        return Alert.alert(
+          "Erro ao cadastrar",
+          "Verifique se todas informações foram inseridas corretamente."
+        );
+
       const formData = new FormData();
 
       // Adicionar os campos básicos
       if (petData.id) formData.append("id", petData.id);
+      formData.append("owner_id", userData.id);
       formData.append("name", petName);
       formData.append("age", age);
       formData.append("description", bio);
-      formData.append("species", species);
+      formData.append("specie", specie);
       formData.append("breed", breed);
 
       // Adicionar as imagens
@@ -71,21 +80,26 @@ const EditPetScreen = ({ route, navigation }) => {
           type: "image/jpeg",
         });
       });
-
       // Fazer a requisição para o backend
-      const response = await fetch(`${API_BASE_URL}pets/update`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${userToken}`, // Assumindo que você tem o token de autenticação
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_BASE_URL}pets/${petData.id ? "update" : "add"}`,
+        {
+          method: `${petData.id ? "PUT" : "POST"}`,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${userToken}`, // Assumindo que você tem o token de autenticação
+          },
+          body: formData,
+        }
+      );
 
       if (response.ok) {
         const updatedPet = await response.json();
         console.log("Pet atualizado com sucesso:", updatedPet);
-        navigation.goBack(); // Navegar de volta ou realizar outra ação após salvar
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
       } else {
         const errorData = await response.json();
         console.error("Erro ao atualizar pet:", errorData.error);
@@ -158,13 +172,35 @@ const EditPetScreen = ({ route, navigation }) => {
         </View>
 
         {/* Nome do Pet */}
-        <View style={styles.nameContainer}>
-          <Text style={styles.petName}>{petName}</Text>
+        {/* <View style={styles.nameContainer}>
+          {isEditing ? (
+            <TextInput
+              style={styles.petNameInput}
+              value={petName}
+              onChangeText={handleInputChange}
+              placeholder="Nome do pet"
+            />
+          ) : (
+            <Text style={styles.petName}>{petName}</Text>
+          )}
           <Icon
             name="pencil"
             type="font-awesome"
             size={20}
-            onPress={() => setPetName(petName ? "" : "Nome editável")}
+            onPress={handlePress}
+          />
+        </View> */}
+
+        {/* Name */}
+        <View style={styles.inputContainer}>
+          <Text>Nome do Pet *</Text>
+          <TextInput
+            style={styles.input}
+            value={petName}
+            onChangeText={setPetName}
+            placeholder="Joaquim"
+            multiline
+            maxLength={500}
           />
         </View>
 
@@ -178,7 +214,7 @@ const EditPetScreen = ({ route, navigation }) => {
             style={styles.input}
             value={bio}
             onChangeText={setBio}
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            placeholder="Joaquim é um gato, obviamente, por ser um gato, ele gatea por ai, eu preciso preencher espaço para testar uma função, então foda-se só escrevendo coisa, sabe, gatos gatear, ninguém sabe o que esperar."
             multiline
             maxLength={500}
           />
@@ -191,7 +227,7 @@ const EditPetScreen = ({ route, navigation }) => {
             style={styles.input}
             value={age}
             onChangeText={(text) => setAge(text.replace(/[^0-9]/g, ""))}
-            placeholder="Idade"
+            placeholder="5"
             keyboardType="numeric"
           />
         </View>
@@ -203,12 +239,12 @@ const EditPetScreen = ({ route, navigation }) => {
             <Pressable
               style={[
                 styles.radioButton,
-                species === "dog" && styles.radioButtonSelected,
+                specie === "dog" && styles.radioButtonSelected,
               ]}
-              onPress={() => setSpecies("dog")}
+              onPress={() => setSpecie("dog")}
             >
               <Icon
-                color={species === "dog" ? "#FF914D" : "#000"}
+                color={specie === "dog" ? "#FF914D" : "#000"}
                 name="dog"
                 type="font-awesome-5"
               />
@@ -217,12 +253,12 @@ const EditPetScreen = ({ route, navigation }) => {
             <Pressable
               style={[
                 styles.radioButton,
-                species === "cat" && styles.radioButtonSelected,
+                specie === "cat" && styles.radioButtonSelected,
               ]}
-              onPress={() => setSpecies("cat")}
+              onPress={() => setSpecie("cat")}
             >
               <Icon
-                color={species === "cat" ? "#FF914D" : "#000"}
+                color={specie === "cat" ? "#FF914D" : "#000"}
                 name="cat"
                 type="font-awesome-5"
               />
@@ -237,23 +273,28 @@ const EditPetScreen = ({ route, navigation }) => {
           <Picker
             selectedValue={breed}
             onValueChange={(itemValue) => setBreed(itemValue)}
-            style={styles.picker}
+            itemStyle={{ borderBottomWidth: 1, borderColor: "#FF914D" }}
           >
-            {species === "dog"
-              ? dogsBreeds.map((breed) => (
-                  <Picker.Item
-                    key={breed.value}
-                    label={breed.label}
-                    value={breed.value}
-                  />
-                ))
-              : catBreeds.map((breed) => (
-                  <Picker.Item
-                    key={breed.value}
-                    label={breed.label}
-                    value={breed.value}
-                  />
-                ))}
+            <Picker.Item label="Selecione uma raça" value="" />
+            {specie === "dog"
+              ? dogsBreeds
+                  .sort((a, b) => a.label.localeCompare(b.label))
+                  .map((breed) => (
+                    <Picker.Item
+                      key={breed.value}
+                      label={breed.label}
+                      value={breed.value}
+                    />
+                  ))
+              : catBreeds
+                  .sort((a, b) => a.label.localeCompare(b.label))
+                  .map((breed) => (
+                    <Picker.Item
+                      key={breed.value}
+                      label={breed.label}
+                      value={breed.value}
+                    />
+                  ))}
           </Picker>
         </View>
 
@@ -340,6 +381,14 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   input: {
+    borderBottomWidth: 1,
+    borderColor: "#FF914D",
+    color: "#333",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    fontSize: 16,
+  },
+  picker: {
     borderBottomWidth: 1,
     borderColor: "#FF914D",
     color: "#333",
