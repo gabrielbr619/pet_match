@@ -35,18 +35,6 @@ const RegisterScreen = ({ navigation }) => {
       );
     }
 
-    fetch(`${API_BASE_URL}users/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-      }),
-    });
-
     navigation.navigate("PetOwnerOrUserScreen", {
       username,
       password,
@@ -79,7 +67,7 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/svgs/adopting_dog.svg")}
+        source={require("../assets/pngs/adopting_dog.png")}
         style={styles.logo}
         contentFit="contain"
       />

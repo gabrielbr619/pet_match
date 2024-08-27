@@ -49,7 +49,7 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/svgs/shelter.svg")}
+        source={require("../assets/pngs/shelter.png")}
         style={styles.image}
       />
       <Text style={styles.title}>Qual seu objetivo?</Text>
@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textContainer: {
-    flexWrap: "wrap",
     flexShrink: 1,
   },
   optionTitle: {

@@ -117,7 +117,9 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
         ) : (
           <>
             <Image
-              source={{ uri: pet?.pictures?.length > 0 ? pet.pictures[0] : "" }}
+              source={{
+                uri: pet?.pictures?.length > 0 ? pet.pictures[0] : null,
+              }}
               style={styles.image}
               contentFit="cover"
             />

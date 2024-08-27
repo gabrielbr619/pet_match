@@ -1,7 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, Pressable } from "react-native";
-import { Button, CheckBox, Icon, Input, Slider } from "react-native-elements";
+import { Button, CheckBox, Icon, Input } from "react-native-elements";
+import Slider from "@react-native-community/slider";
 
 import { API_BASE_URL } from "../../common";
 

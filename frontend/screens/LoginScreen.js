@@ -115,27 +115,29 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/svgs/woman_playing_with_dog.svg")}
+        source={require("../assets/pngs/woman_playing_with_dog.png")}
         style={styles.logo}
         contentFit="contain"
       />
-
       <Text style={styles.title}>Acessar o App</Text>
       <Text style={styles.subtitle}>
         Por favor insira seus dados para entrar no app
       </Text>
-
       <TextInput
         label="Email"
         value={email}
         onChangeText={(text) => setEmail(text)}
         style={styles.input}
-        keyboardType="email-address"
+        inputMode="email"
         autoCapitalize="none"
         left={
           <TextInput.Icon
-            icon={() => (
-              <MaterialCommunityIcons name="email" size={24} color="#FF914D" />
+            icon={({ size, color }) => (
+              <MaterialCommunityIcons
+                name="email"
+                size={size}
+                color="#FF914D"
+              />
             )}
           />
         }
@@ -155,25 +157,21 @@ const LoginScreen = () => {
           />
         }
       />
-
       <Pressable
         style={styles.forgotContainer}
         onPress={() => console.log("Forgot Password Pressed")}
       >
         <Text style={styles.forgotText}>Esqueceu a senha?</Text>
       </Pressable>
-
       <Button mode="contained" onPress={handleLogin} style={styles.button}>
         Logar
       </Button>
-
       <Pressable onPress={() => navigation.navigate("Register")}>
         <Text style={styles.signUpText}>
           Ainda não tem conta?{" "}
           <Text style={styles.signUpLink}>Cadastre-se!</Text>
         </Text>
       </Pressable>
-
       {/* <View style={styles.socialContainer}>
         <SocialIcon
           button

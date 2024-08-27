@@ -51,7 +51,7 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
 
   const handleEditPet = (pet) => {
     console.log(pet);
-    navigation.navigate("EditPet", { petData: pet, userToken });
+    navigation.navigate("EditPet", { petData: pet, userToken, userData });
   };
 
   const renderPet = ({ item }) => (
