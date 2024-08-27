@@ -1,7 +1,5 @@
-const { createMessage, getMessagesByChatId } = require('../models/Message');
-const cloudinary = require('../config/cloudinary');
-const streamifier = require('streamifier');
-const { uploadManyPicutres } = require('../helpers/uploadPictures');
+const { createMessage, getMessagesByChatId } = require("../models/Message");
+const { uploadManyPictures } = require("../helpers/uploadPictures");
 
 exports.sendMessage = async (req, res) => {
   try {
@@ -9,7 +7,7 @@ exports.sendMessage = async (req, res) => {
     let imageUrls = [];
 
     if (req.files) {
-      imageUrls = await uploadManyPicutres(req)
+      imageUrls = await uploadManyPictures(req);
     }
 
     const message = await createMessage(chatId, senderId, content, imageUrls);
