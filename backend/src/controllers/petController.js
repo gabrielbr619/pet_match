@@ -1,34 +1,64 @@
 const pool = require("../config/db");
-const { uploadManyPicutres } = require("../helpers/uploadPictures");
+const { uploadManyPictures } = require("../helpers/uploadPictures");
 const {
   createPet,
   deletePet,
   getRandomPetForUser,
   markPetAsViewed,
   dislikePet,
+  updatePet,
 } = require("../models/Pet");
 const { RegisterPetOnPetOwner } = require("../models/PetOwner");
 
 exports.registerPet = async (req, res) => {
   try {
-    const { name, age, description, race, owner_id } = req.body;
+    const { name, age, description, specie, breed, owner_id } = req.body;
 
     let pictures = [];
 
     if (req.files) {
-      pictures = await uploadManyPicutres(req, "pet_pictures");
+      pictures = await uploadManyPictures(req, "pet_pictures");
     }
 
     const pet = await createPet({
       name,
       age,
       description,
-      race,
+      specie,
+      breed,
       pictures,
       owner_id,
     });
-    const updatedPetOwner = await RegisterPetOnPetOwner(owner_id, pet.id);
+
+    await RegisterPetOnPetOwner(owner_id, pet.id);
+
     res.status(201).json(pet);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.updatePetById = async (req, res) => {
+  try {
+    const { id, name, age, description, specie, breed } = req.body;
+
+    let pictures = [];
+
+    if (req.files) {
+      pictures = await uploadManyPictures(req, "pet_pictures");
+    }
+
+    const updatedPet = await updatePet({
+      id,
+      name,
+      age,
+      description,
+      specie,
+      breed,
+      pictures: pictures.length > 0 ? pictures : req.body.existingPictures, // Se não houverem novas imagens, manter as existentes
+    });
+
+    res.status(200).json(updatedPet);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
