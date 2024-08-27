@@ -15,11 +15,12 @@ const Stack = createStackNavigator();
 const App = () => {
   const [userToken, setUserToken] = useState(null);
   const [isTokenValid, setIsTokenValid] = useState(null);
-  const [isPetOwner, setIsPetOwner] = useState(false);
+  const [isPetOwner, setIsPetOwner] = useState(null);
 
   useEffect(() => {
     const checkTokenValidity = async (token) => {
       try {
+        console.log("Verificando validade do token...");
         const response = await fetch(`${API_BASE_URL}auth/check-token`, {
           method: "GET",
           headers: {
@@ -29,13 +30,15 @@ const App = () => {
         });
 
         if (response.ok) {
+          console.log("Token válido.");
           setIsTokenValid(true);
         } else {
+          console.log("Token inválido ou expirado.");
           setIsTokenValid(false);
           await AsyncStorage.removeItem("userToken");
         }
       } catch (error) {
-        console.error("Failed to check token validity:", error);
+        console.error("Falha ao verificar a validade do token:", error);
         setIsTokenValid(false);
       }
     };
@@ -44,93 +47,74 @@ const App = () => {
       try {
         const token = await AsyncStorage.getItem("userToken");
         const userData = await AsyncStorage.getItem("user");
+        console.log("Token obtido do AsyncStorage:", token);
+        console.log("userData:", userData);
 
         if (userData) {
           const userDataParsed = JSON.parse(userData);
-          setUserToken(token);
-
           if (userDataParsed.hasOwnProperty("pets")) {
             setIsPetOwner(true);
           }
         }
 
-        setIsTokenValid(false);
-
         if (token) {
+          setUserToken(token);
           await checkTokenValidity(token);
         } else {
+          console.log("Nenhum token encontrado.");
           setIsTokenValid(false);
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        setIsTokenValid(false); // Defina isTokenValid para false em caso de erro
+        console.error("Erro ao buscar os dados do usuário:", error);
+        setIsTokenValid(false);
       }
     };
 
     getUserToken();
   }, []);
 
+  useEffect(() => {
+    console.log("Estado isTokenValid atualizado:", isTokenValid);
+    console.log("Estado isPetOwner atualizado:", isPetOwner);
+  }, [isTokenValid, isPetOwner]);
+
   if (isTokenValid === null) {
     // Mostra um indicador de carregamento enquanto verifica o token
     return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Loading"
-            component={LoadingScreen}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Carregando...</Text>
+      </View>
     );
   }
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName={isTokenValid ? "Tabs" : "Welcome"}>
-        {isTokenValid ? (
-          <>
-            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-              {(props) => <Tabs {...props} isPetOwner={isPetOwner} />}
-            </Stack.Screen>
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="Welcome"
-              component={WelcomeScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="PetOwnerOrUserScreen"
-              component={PetOwnerOrUserScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="Tabs" options={{ headerShown: false }}>
-              {(props) => <Tabs {...props} isPetOwner={isPetOwner} />}
-            </Stack.Screen>
-          </>
-        )}
+        <Stack.Screen
+          name="Welcome"
+          component={WelcomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PetOwnerOrUserScreen"
+          component={PetOwnerOrUserScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="Tabs" options={{ headerShown: false }}>
+          {(props) => <Tabs {...props} isPetOwner={isPetOwner} />}
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
-  );
-};
-
-const LoadingScreen = () => {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Carregando...</Text>
-    </View>
   );
 };
 
