@@ -10,6 +10,7 @@ import SearchScreen from "./user/SearchScreen";
 import ChatsScreen from "./ChatsScreen";
 import MessageScreen from "./MessageScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ResultsScreen from "./user/ResultsScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -48,6 +49,24 @@ const PetOwnerStack = ({ userData, userToken }) => {
       <Stack.Screen
         name="EditPet"
         component={EditPetScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+// Stack para busca
+const SearchStack = ({ userData, userToken }) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="SearchPet" options={{ headerShown: false }}>
+        {(props) => (
+          <SearchScreen {...props} userData={userData} userToken={userToken} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen
+        name="Results"
+        component={ResultsScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -158,7 +177,7 @@ export default function Tabs() {
             options={{ headerShown: false, tabBarShowLabel: false }}
           >
             {(props) => (
-              <SearchScreen
+              <SearchStack
                 {...props}
                 userData={userData}
                 userToken={userToken}

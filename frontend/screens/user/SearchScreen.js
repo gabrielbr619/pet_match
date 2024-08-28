@@ -97,9 +97,9 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
       console.log("Pets encontrados:", petsData);
 
       // Navegar para a tela de resultados com os dados dos pets
-      // navigation.navigate("Results", {
-      //   petsData,
-      // });
+      navigation.navigate("Results", {
+        petsData,
+      });
     } catch (error) {
       console.error(error);
       Alert.alert("Erro", "Não foi possível buscar pets no momento.");
