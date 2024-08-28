@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { calculateDistance } = require("../helpers/calculateDistance");
 const { uploadManyPictures } = require("../helpers/uploadPictures");
 const {
   createPet,
@@ -7,8 +8,76 @@ const {
   markPetAsViewed,
   dislikePet,
   updatePet,
+  findPets,
 } = require("../models/Pet");
 const { RegisterPetOnPetOwner } = require("../models/PetOwner");
+const NodeGeocoder = require("node-geocoder");
+
+const options = {
+  provider: "google",
+  apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // Substitua pela sua chave da API do Google Maps
+};
+const geocoder = NodeGeocoder(options);
+
+exports.findPets = async (req, res) => {
+  const {
+    selectedSpecie,
+    selectedGender,
+    selectedBreed,
+    location,
+    currentLocation,
+  } = req.body;
+
+  try {
+    let userCoordinates;
+
+    // Determinar as coordenadas do usuário
+    if (currentLocation) {
+      userCoordinates = currentLocation;
+    } else if (location) {
+      const geoData = await geocoder.geocode(location);
+      userCoordinates = {
+        latitude: geoData[0].latitude,
+        longitude: geoData[0].longitude,
+      };
+    }
+
+    // Buscar pets aplicando filtros
+    const pets = await findPets({
+      specie: selectedSpecie,
+      gender: selectedGender,
+      breed: selectedBreed,
+    });
+
+    // Separar pets com coordenadas e sem coordenadas
+    const petsWithCoordinates = [];
+    const petsWithoutCoordinates = [];
+
+    pets.forEach((pet) => {
+      if (pet.coordinates && pet.coordinates.x && pet.coordinates.y) {
+        const distance = calculateDistance(
+          userCoordinates.latitude,
+          userCoordinates.longitude,
+          pet.coordinates.x,
+          pet.coordinates.y
+        );
+        return petsWithCoordinates.push({ ...pet, distance });
+      }
+      petsWithoutCoordinates.push(pet);
+    });
+
+    // Ordenar pets com coordenadas pela distância mais próxima
+    petsWithCoordinates.sort((a, b) => a.distance - b.distance);
+
+    // Combinar arrays: pets com coordenadas primeiro, seguidos pelos sem coordenadas
+    const finalPetsList = [...petsWithCoordinates, ...petsWithoutCoordinates];
+
+    res.status(200).json(finalPetsList);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao buscar pets." });
+  }
+};
 
 exports.registerPet = async (req, res) => {
   try {

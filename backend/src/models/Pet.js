@@ -6,6 +6,33 @@ const selectPetById = async (pet_id) => {
   return res.rows[0];
 };
 
+const findPets = async ({ specie, breed, gender }) => {
+  let query =
+    "SELECT pets.*, pet_owners.coordinates FROM pets JOIN pet_owners ON pets.owner_id = pet_owners.id WHERE 1=1";
+  const params = [];
+
+  // Aplicar filtros dinamicamente
+  if (specie) {
+    params.push(specie);
+    query += ` AND pets.specie = $${params.length}`;
+  }
+  if (breed) {
+    params.push(breed);
+    query += ` AND pets.breed = $${params.length}`;
+  }
+  if (gender) {
+    params.push(gender);
+    query += ` AND pets.gender = $${params.length}`;
+  }
+
+  try {
+    const res = await pool.query(query, params);
+    return res.rows;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const selectAllPetOwnerPets = async (petOwnerId) => {
   const res = await pool.query("SELECT * FROM Pets WHERE owner_id = $1", [
     petOwnerId,
@@ -86,4 +113,5 @@ module.exports = {
   dislikePet,
   markPetAsViewed,
   selectAllPetOwnerPets,
+  findPets,
 };

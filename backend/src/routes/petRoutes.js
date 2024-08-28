@@ -5,12 +5,15 @@ const {
   getRandomPet,
   userDislikePet,
   updatePetById,
+  findPets,
 } = require("../controllers/petController");
 const { authToken } = require("../middlewares/authToken");
 const upload = require("../config/multer");
 const router = express.Router();
 
 router.get("/randomPet/:userId", authToken, getRandomPet);
+
+router.post("/search", authToken, findPets);
 
 router.post("/add", authToken, upload.array("pictures", 5), registerPet);
 
