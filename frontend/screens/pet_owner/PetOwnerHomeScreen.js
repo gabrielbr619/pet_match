@@ -50,7 +50,6 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
   );
 
   const handleEditPet = (pet) => {
-    console.log(pet);
     navigation.navigate("EditPet", { petData: pet, userToken, userData });
   };
 
@@ -64,7 +63,7 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
           item?.pictures?.length === 0 ? { backgroundColor: "#BDBDBD" } : null
         }
         source={item?.pictures?.length > 0 ? { uri: item.pictures[0] } : null}
-        icon={{ name: "paw", type: "font-awesome", size: 80 }}
+        icon={{ name: "paw", type: "font-awesome", size: 170 }}
       />
 
       <View style={{ display: "flex", flexDirection: "row" }}>
@@ -91,12 +90,7 @@ const PetOwnerHomeScreen = ({ userData, userToken }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.navigate("Profile")}>
-          <Icon
-            name="user-circle"
-            type="font-awesome"
-            size={40}
-            color={"#FFF"}
-          />
+          <Icon name="user" type="font-awesome" size={40} color={"#FFF"} />
         </Pressable>
         <Text style={styles.headerTitle}>Pets</Text>
         <Pressable>
