@@ -11,7 +11,8 @@ import { Icon, Text } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import io from "socket.io-client";
 import { API_BASE_URL } from "../common";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Avatar from "./Avatar";
 
 const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
 
@@ -64,6 +65,7 @@ const GiftedChatComponent = ({
         });
         const data = await response.json();
         const formattedMessages = data.map(formatMessage);
+        console.log(isPetOwner, "IS PEEEEEEEEEET OWNEEEEEEEEEEEER");
         setMessages(formattedMessages); // Assuming the API returns an array of messages
       } catch (error) {
         console.error("Failed to fetch messages:", error);
@@ -72,17 +74,37 @@ const GiftedChatComponent = ({
     fetchMessages();
   }, [userToken]);
 
-  const formatMessage = (message) => ({
-    _id: message.id,
-    text: message.content,
-    createdAt: new Date(message.created_at),
-    user: {
-      _id: message.sender_id,
-      name: userData.name || "User",
-      avatar: userData.avatar || null, // Ensure you have a userData with avatar property
-    },
-    image: message.image_urls.length > 0 ? message.image_urls[0] : null,
-  });
+  const formatMessage = (message) => {
+    const utcDate = new Date(message.created_at);
+
+    // Verifica se o usuário logado é o remetente da mensagem
+    const isCurrentUserSender =
+      message.sender_id === (isPetOwner ? pet_owner.id : userData.id);
+
+    return {
+      _id: message.id,
+      text: message.content,
+      createdAt: utcDate,
+      user: {
+        _id: message.sender_id,
+        name: isCurrentUserSender
+          ? isPetOwner
+            ? pet_owner.username
+            : userData.username
+          : isPetOwner
+          ? userData.username
+          : pet_owner.username,
+        avatar: isCurrentUserSender
+          ? isPetOwner
+            ? pet_owner.profile_picture
+            : userData.profile_picture
+          : isPetOwner
+          ? userData.profile_picture
+          : pet_owner.profile_picture,
+      },
+      image: message.image_urls.length > 0 ? message.image_urls[0] : null,
+    };
+  };
 
   const onSend = useCallback(
     async (messages = []) => {
@@ -94,7 +116,7 @@ const GiftedChatComponent = ({
       const message = messages[0] || {}; // Use o objeto de mensagem ou um vazio
       const formData = new FormData();
       formData.append("chatId", chatId);
-      //   formData.append("senderId", userData.id);
+      formData.append("senderId", isPetOwner ? pet_owner.id : userData.id);
       formData.append("content", message.text || ""); // Permitir que o conteúdo seja vazio se não houver texto
 
       // Verificar se imagens estão presentes e adicioná-las ao FormData
@@ -206,35 +228,56 @@ const GiftedChatComponent = ({
     />
   );
 
-  const renderBubble = (props) => (
-    <Bubble
-      {...props}
-      wrapperStyle={{
-        right: {
-          backgroundColor: "#FF914D", // Cor da mensagem enviada pelo usuário que está usando o app
-        },
-        left: {
-          backgroundColor: "#FF9999", // Cor da mensagem enviada pelo outro usuário
-        },
-      }}
-      textStyle={{
-        right: {
-          color: "#FFF", // Texto em branco para mensagens enviadas pelo usuário
-        },
-        left: {
-          color: "#FFF", // Texto em branco para mensagens recebidas
-        },
-      }}
-      timeTextStyle={{
-        right: {
-          color: "#FFF", // Hora em branco para mensagens enviadas pelo usuário
-        },
-        left: {
-          color: "#FFF", // Hora em branco para mensagens recebidas
-        },
-      }}
-    />
-  );
+  const renderAvatar = (props) => {
+    console.log(props);
+    const profile_picture = props.currentMessage.user.avatar;
+    return (
+      <Avatar
+        rounded
+        size={40}
+        source={profile_picture ? { uri: profile_picture } : null}
+        icon={{ name: "user", type: "font-awesome", size: 40 }}
+        containerStyle={styles.avatarContainer}
+        avatarStyle={!profile_picture ? { backgroundColor: "#BDBDBD" } : null}
+      />
+    );
+  };
+
+  const renderBubble = (props) => {
+    const isCurrentUserSender =
+      props.currentMessage.user._id ===
+      (isPetOwner ? pet_owner.id : userData.id);
+
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: isCurrentUserSender ? "#FF914D" : "#FF9999",
+          },
+          left: {
+            backgroundColor: isCurrentUserSender ? "#FF9999" : "#FF914D",
+          },
+        }}
+        textStyle={{
+          right: {
+            color: "#FFF",
+          },
+          left: {
+            color: "#FFF",
+          },
+        }}
+        timeTextStyle={{
+          right: {
+            color: "#FFF",
+          },
+          left: {
+            color: "#FFF",
+          },
+        }}
+      />
+    );
+  };
 
   const renderDay = (props) => {
     // Customiza a data de separação entre as mensagens
@@ -266,10 +309,12 @@ const GiftedChatComponent = ({
       renderInputToolbar={renderInputToolbar}
       renderActions={renderActions}
       renderBubble={renderBubble}
+      renderAvatar={renderAvatar} // Usando o renderizador de avatar personalizado
       renderDay={renderDay}
     />
   );
 };
+
 const styles = StyleSheet.create({
   inputToolbar: {
     borderTopWidth: 1,
@@ -285,8 +330,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dayText: {
-    color: "#999", // Cor da data de separação
+    color: "#999",
     fontSize: 12,
+  },
+  avatarContainer: {
+    margin: 5,
   },
 });
 
