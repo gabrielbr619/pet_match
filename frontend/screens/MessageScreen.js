@@ -21,9 +21,6 @@ const MessageScreen = ({ route, navigation }) => {
   const { chatId, userData, userToken, pet_owner, pet, isPetOwner } =
     route.params;
 
-  useEffect(() => {
-    console.log(userData);
-  }, [userData]);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>

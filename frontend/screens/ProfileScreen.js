@@ -122,6 +122,7 @@ const ProfileScreen = ({ navigation, userData, userToken }) => {
         <Avatar
           size={"xlarge"}
           source={profilePicture ? { uri: profilePicture } : null}
+          icon={{ name: "user", type: "font-awesome", size: 40 }}
           style={styles.profilePicture}
           rounded
         >

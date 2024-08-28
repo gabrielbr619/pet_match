@@ -25,6 +25,7 @@ const Avatar = ({
         <View style={[styles.iconContainer, avatarStyle]}>
           <Ionicons
             name={icon.name || "paw"}
+            type={icon.type || "font-awesome"}
             size={icon.size * 0.5} // Tamanho do ícone proporcional ao tamanho do avatar
             color={icon.color || "#FFF"}
           />

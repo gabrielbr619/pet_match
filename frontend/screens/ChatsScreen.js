@@ -92,7 +92,6 @@ const ChatsScreen = ({ navigation }) => {
   };
 
   const renderChatItem = ({ item }) => {
-    console.log(item.user, "IIIIIIIIIIIIIIIIITEEEEEEEEEEEEEEEEM");
     return (
       <Pressable
         onPress={() =>
@@ -172,35 +171,6 @@ const ChatsScreen = ({ navigation }) => {
     );
   }
 
-  if (isPetOwner) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Pressable onPress={() => navigation.goBack()}>
-            <Icon name="arrow-back" type="material" size={30} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Mensagens</Text>
-          <Pressable>
-            <Icon name="settings" type="material" size={30} />
-          </Pressable>
-        </View>
-        {chats.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Nenhum chat encontrado.</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={chats}
-            renderItem={renderChatItem}
-            keyExtractor={(item) =>
-              item.chat_id ? item.chat_id.toString() : Math.random().toString()
-            }
-          />
-        )}
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -209,7 +179,7 @@ const ChatsScreen = ({ navigation }) => {
         </Pressable>
         <Text style={styles.headerTitle}>Mensagens</Text>
         <Pressable>
-          <Icon name="settings" type="material" size={30} />
+          <Icon name="settings" type="material" size={30} color={"#fff"} />
         </Pressable>
       </View>
       {chats.length === 0 ? (
