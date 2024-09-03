@@ -25,6 +25,7 @@ const EditPetScreen = ({ route, navigation }) => {
   const [petName, setPetName] = useState(petData?.name || "");
   const [bio, setBio] = useState(petData?.description || "");
   const [age, setAge] = useState(petData?.age ? petData.age.toString() : "");
+  const [gender, setGender] = useState(petData?.gender || "male");
   const [specie, setSpecie] = useState(petData?.specie || "dog");
   const [breed, setBreed] = useState(petData?.breed || "");
   const [pictures, setPictures] = useState(petData?.pictures || []);
@@ -55,7 +56,7 @@ const EditPetScreen = ({ route, navigation }) => {
   // Função para salvar as alterações
   const handleSave = async () => {
     try {
-      if (petName === "" || specie === "" || breed === "")
+      if (!petName || !specie || !breed || !age)
         return Alert.alert(
           "Erro ao cadastrar",
           "Verifique se todas informações foram inseridas corretamente."
@@ -68,6 +69,7 @@ const EditPetScreen = ({ route, navigation }) => {
       formData.append("owner_id", userData.id);
       formData.append("name", petName);
       formData.append("age", age);
+      formData.append("gender", gender);
       formData.append("description", bio);
       formData.append("specie", specie);
       formData.append("breed", breed);
@@ -231,7 +233,40 @@ const EditPetScreen = ({ route, navigation }) => {
             keyboardType="numeric"
           />
         </View>
-
+        {/* Sexo */}
+        <View style={styles.inputContainer}>
+          <Text>Sexo</Text>
+          <View style={styles.radioGroup}>
+            <Pressable
+              style={[
+                styles.radioButton,
+                gender === "female" && styles.radioButtonSelected,
+              ]}
+              onPress={() => setGender("female")}
+            >
+              <Icon
+                color={gender === "female" ? "#FF914D" : "#000"}
+                name="female"
+                type="font-awesome-5"
+              />
+              <Text style={styles.radioText}>Fêmea</Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.radioButton,
+                gender === "male" && styles.radioButtonSelected,
+              ]}
+              onPress={() => setGender("male")}
+            >
+              <Icon
+                color={gender === "male" ? "#FF914D" : "#000"}
+                name="male"
+                type="font-awesome-5"
+              />
+              <Text style={styles.radioText}>Macho</Text>
+            </Pressable>
+          </View>
+        </View>
         {/* Espécie */}
         <View style={styles.inputContainer}>
           <Text>Espécie</Text>

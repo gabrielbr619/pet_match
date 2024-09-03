@@ -11,12 +11,17 @@ import {
 import { Icon } from "react-native-elements";
 import { API_BASE_URL } from "../../common";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Avatar from "../../components/Avatar";
 
 const HomeScreen = ({ navigation, userData, userToken }) => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!userData || !userToken) {
+      Alert.alert("Erro", "Dados do usuário não disponíveis.");
+      return;
+    }
     if (userData.id) {
       fetchPet(userData.id);
     }
@@ -24,6 +29,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
 
   const fetchPet = async (userId) => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}pets/randomPet/${userId}`, {
         method: "GET",
         headers: {
@@ -32,9 +38,15 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
           Authorization: `Bearer ${userToken}`,
         },
       });
+      if (!response.ok) {
+        setPet(data);
+        return setLoading(false);
+      }
       const data = await response.json();
+
       setPet(data);
       setLoading(false);
+      console.log(pet);
     } catch (error) {
       console.error(error);
       setLoading(false);
@@ -56,6 +68,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
           pet_owner_id: pet.owner_id,
         }),
       });
+      navigation.navigate("Chats");
       fetchPet(userData.id); // Fetch a new pet after liking
     } catch (error) {
       console.error(error);
@@ -79,15 +92,6 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#fc9355" />
-        <Text>Procurando Pets...</Text>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -109,50 +113,87 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
           />
         </Pressable>
       </View>
-      <View style={styles.card}>
-        {!pet ? (
-          <View style={styles.container}>
-            <Text>No pet found</Text>
-          </View>
-        ) : (
-          <>
-            <Image
-              source={{
-                uri: pet?.pictures?.length > 0 ? pet.pictures[0] : null,
-              }}
-              style={styles.image}
-              contentFit="cover"
-            />
-            <View style={styles.cardInfo}>
-              <Text style={styles.petName}>{`${pet.name}, ${pet.age}`}</Text>
-              <Text style={styles.petLocation}>Santos, SP</Text>
-              <Text style={styles.petDescription}>{pet.description}</Text>
-              <View style={styles.actions}>
-                <Pressable onPress={handleDislike} style={styles.actionButton}>
-                  <View style={styles.circle}>
-                    <Icon
-                      name="times"
-                      type="font-awesome"
-                      size={35}
-                      color="#FFFFFF"
-                    />
-                  </View>
-                </Pressable>
-                <Pressable onPress={handleLike} style={styles.actionButton}>
-                  <View style={styles.circle}>
-                    <Icon
-                      name="heart"
-                      type="font-awesome"
-                      size={30}
-                      color="#FFFFFF"
-                    />
-                  </View>
-                </Pressable>
-              </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fc9355" />
+          <Text>Procurando Pets...</Text>
+        </View>
+      ) : (
+        <View style={styles.card}>
+          {!pet ? (
+            <View style={styles.container}>
+              <Text style={{ fontSize: 18 }}>
+                Não há mais pets na sua região :(
+              </Text>
             </View>
-          </>
-        )}
-      </View>
+          ) : (
+            <>
+              <Pressable
+                style={{ flex: 1, width: "100%" }}
+                onPress={() => navigation.navigate("PetDetail", { pet })}
+              >
+                <Avatar
+                  rounded
+                  size={250}
+                  containerStyle={styles.image}
+                  source={
+                    pet?.pictures?.length > 0 ? { uri: pet.pictures[0] } : null
+                  }
+                  icon={{ name: "paw", type: "font-awesome", size: 60 }}
+                />
+              </Pressable>
+
+              <View style={styles.cardInfo}>
+                <Pressable
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={() => navigation.navigate("PetDetail", { pet })}
+                >
+                  <Text
+                    style={styles.petName}
+                  >{`${pet.name}, ${pet.age}`}</Text>
+                  <Text style={styles.petLocation}>Santos, SP</Text>
+                  <Text style={styles.petDescription}>
+                    {pet?.description?.length > 100
+                      ? `${pet.description.substring(0, 100)}...`
+                      : pet.description}
+                  </Text>
+                </Pressable>
+                <View style={styles.actions}>
+                  <Pressable
+                    onPress={handleDislike}
+                    style={styles.actionButton}
+                  >
+                    <View style={styles.circle}>
+                      <Icon
+                        name="times"
+                        type="font-awesome"
+                        size={35}
+                        color="#FFFFFF"
+                      />
+                    </View>
+                  </Pressable>
+                  <Pressable onPress={handleLike} style={styles.actionButton}>
+                    <View style={styles.circle}>
+                      <Icon
+                        name="heart"
+                        type="font-awesome"
+                        size={30}
+                        color="#FFFFFF"
+                      />
+                    </View>
+                  </Pressable>
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+      )}
+
       {/* <View style={styles.footer}>
         <Icon name="home" type="font-awesome" size={30} onPress={() => navigation.navigate('Home')} />
         <Icon name="search" type="font-awesome" size={30} onPress={() => navigation.navigate('Discover')} />
@@ -195,7 +236,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#ffffff",
     width: "90%",
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.08)",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   cardInfo: {
     padding: 20,

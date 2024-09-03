@@ -1,12 +1,5 @@
-const { Pool } = require('pg');
-require('dotenv').config();
-console.log({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  password: process.env.DB_PASS,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-})
+const { Pool } = require("pg");
+require("dotenv").config();
 const pool = new Pool({
   user: "avnadmin",
   password: "AVNS_eWSevNy59gqCpOK_82M",
@@ -14,8 +7,8 @@ const pool = new Pool({
   port: 19951,
   database: "defaultdb",
   ssl: {
-      rejectUnauthorized: true,
-      ca: `-----BEGIN CERTIFICATE-----
+    rejectUnauthorized: true,
+    ca: `-----BEGIN CERTIFICATE-----
 MIIEQTCCAqmgAwIBAgIUf4waso87OJazLxNeE2dJKrjeUEkwDQYJKoZIhvcNAQEM
 BQAwOjE4MDYGA1UEAwwvMTQ2YWIxMjEtNzY3YS00MjliLWIwMzctOTJhOWQ2Y2Nl
 OTViIFByb2plY3QgQ0EwHhcNMjQwNjA0MTMwNjU5WhcNMzQwNjAyMTMwNjU5WjA6

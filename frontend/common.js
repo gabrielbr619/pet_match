@@ -1,8 +1,9 @@
 import { Platform } from "react-native";
+import { LOCALHOST_IOS_ANDROID, LOCALHOST_WEB } from "@env";
 
 const LOCALHOST =
   Platform.OS === "ios" || Platform.OS === "android"
-    ? "http://192.168.3.21:3000"
-    : "http://localhost:3000";
-console.log(Platform.OS);
-export const API_BASE_URL = LOCALHOST + "/api/";
+    ? LOCALHOST_IOS_ANDROID
+    : LOCALHOST_WEB;
+
+export const API_BASE_URL = `${LOCALHOST}/api/`;

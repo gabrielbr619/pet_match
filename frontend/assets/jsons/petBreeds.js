@@ -1,4 +1,5 @@
 const dogsBreeds = [
+  { label: "Não sei", value: "unknown" },
   { label: "Labrador Retriever", value: "labrador" },
   { label: "Golden Retriever", value: "golden" },
   { label: "Bulldog", value: "bulldog" },
@@ -31,6 +32,7 @@ const dogsBreeds = [
 ];
 
 const catBreeds = [
+  { label: "Não sei", value: "unknown" },
   { label: "Persa", value: "persa" },
   { label: "Siamês", value: "siames" },
   { label: "Maine Coon", value: "mainecoon" },

@@ -11,6 +11,7 @@ import ChatsScreen from "./ChatsScreen";
 import MessageScreen from "./MessageScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ResultsScreen from "./user/ResultsScreen";
+import PetDetailScreen from "./user/PetDetailScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -67,6 +68,28 @@ const SearchStack = ({ userData, userToken }) => {
       <Stack.Screen
         name="Results"
         component={ResultsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PetDetail"
+        component={PetDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const HomeStack = ({ userData, userToken }) => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="UserHome" options={{ headerShown: false }}>
+        {(props) => (
+          <HomeScreen {...props} userData={userData} userToken={userToken} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen
+        name="PetDetail"
+        component={PetDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -165,11 +188,7 @@ export default function Tabs() {
             options={{ headerShown: false, tabBarShowLabel: false }}
           >
             {(props) => (
-              <HomeScreen
-                {...props}
-                userData={userData}
-                userToken={userToken}
-              />
+              <HomeStack {...props} userData={userData} userToken={userToken} />
             )}
           </Tab.Screen>
           <Tab.Screen

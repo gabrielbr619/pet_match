@@ -47,13 +47,26 @@ const ChatsScreen = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       if (userData.id) {
-        fetchChats(userData.id);
+        loadChatsFromCache(userData.id);
       }
     }, [userData])
   );
 
+  const loadChatsFromCache = async (userId) => {
+    try {
+      const cachedChats = await AsyncStorage.getItem(`chats_${userId}`);
+      if (cachedChats) {
+        setChats(JSON.parse(cachedChats));
+        setLoading(false);
+      }
+      fetchChats(userId);
+    } catch (error) {
+      console.error("Error loading chats from cache:", error);
+      fetchChats(userId);
+    }
+  };
+
   const fetchChats = async (userId) => {
-    setLoading(true);
     try {
       const response = await fetch(
         `${API_BASE_URL}chats/${
@@ -71,6 +84,7 @@ const ChatsScreen = ({ navigation }) => {
       const data = await response.json();
       if (Array.isArray(data)) {
         setChats(data); // Assuming the API returns an array of chats
+        await AsyncStorage.setItem(`chats_${userId}`, JSON.stringify(data));
       }
       setLoading(false);
     } catch (error) {
@@ -94,16 +108,16 @@ const ChatsScreen = ({ navigation }) => {
   const renderChatItem = ({ item }) => {
     return (
       <Pressable
-        onPress={() =>
+        onPress={() => {
           navigation.navigate("Message", {
             chatId: item.chat_id,
             userData: item.user,
             userToken,
-            pet_owner: item.petOwner,
+            pet_owner: isPetOwner ? userData : item.pet_owner,
             pet: item.pet,
             isPetOwner,
-          })
-        }
+          });
+        }}
       >
         {isPetOwner ? (
           <ListItem bottomDivider>

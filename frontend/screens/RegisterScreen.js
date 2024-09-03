@@ -86,7 +86,11 @@ const RegisterScreen = ({ navigation }) => {
         left={
           <TextInput.Icon
             icon={() => (
-              <MaterialCommunityIcons name="account-circle" color="#FF914D" />
+              <MaterialCommunityIcons
+                name="account-circle"
+                size={24}
+                color="#FF914D"
+              />
             )}
           />
         }
@@ -100,7 +104,9 @@ const RegisterScreen = ({ navigation }) => {
         style={styles.input}
         left={
           <TextInput.Icon
-            icon={() => <MaterialCommunityIcons name="lock" color="#FF914D" />}
+            icon={() => (
+              <MaterialCommunityIcons name="lock" size={24} color="#FF914D" />
+            )}
           />
         }
       />
@@ -113,7 +119,9 @@ const RegisterScreen = ({ navigation }) => {
         autoCapitalize="none"
         left={
           <TextInput.Icon
-            icon={() => <MaterialCommunityIcons name="email" color="#FF914D" />}
+            icon={() => (
+              <MaterialCommunityIcons size={24} name="email" color="#FF914D" />
+            )}
           />
         }
       />

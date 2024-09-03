@@ -15,7 +15,7 @@ const NodeGeocoder = require("node-geocoder");
 
 const options = {
   provider: "google",
-  apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // Substitua pela sua chave da API do Google Maps
+  apiKey: process.env.GOOGLE_MAPS_API_KEY, // Substitua pela sua chave da API do Google Maps
 };
 const geocoder = NodeGeocoder(options);
 
@@ -26,6 +26,7 @@ exports.findPets = async (req, res) => {
     selectedBreed,
     location,
     currentLocation,
+    userId,
   } = req.body;
 
   try {
@@ -47,6 +48,7 @@ exports.findPets = async (req, res) => {
       specie: selectedSpecie,
       gender: selectedGender,
       breed: selectedBreed,
+      userId,
     });
 
     // Separar pets com coordenadas e sem coordenadas
@@ -81,7 +83,8 @@ exports.findPets = async (req, res) => {
 
 exports.registerPet = async (req, res) => {
   try {
-    const { name, age, description, specie, breed, owner_id } = req.body;
+    const { name, age, description, specie, breed, owner_id, gender } =
+      req.body;
 
     let pictures = [];
 
@@ -97,6 +100,7 @@ exports.registerPet = async (req, res) => {
       breed,
       pictures,
       owner_id,
+      gender,
     });
 
     await RegisterPetOnPetOwner(owner_id, pet.id);
@@ -109,7 +113,7 @@ exports.registerPet = async (req, res) => {
 
 exports.updatePetById = async (req, res) => {
   try {
-    const { id, name, age, description, specie, breed } = req.body;
+    const { id, name, age, description, specie, breed, gender } = req.body;
 
     let pictures = [];
 
@@ -125,6 +129,7 @@ exports.updatePetById = async (req, res) => {
       specie,
       breed,
       pictures: pictures.length > 0 ? pictures : req.body.existingPictures, // Se não houverem novas imagens, manter as existentes
+      gender,
     });
 
     res.status(200).json(updatedPet);

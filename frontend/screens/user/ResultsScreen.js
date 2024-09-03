@@ -18,7 +18,13 @@ const ResultsScreen = ({ route, navigation }) => {
       </View>
       <FlatList
         data={petsData}
-        renderItem={({ item }) => <PetCard pet={item} />}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => navigation.navigate("PetDetail", { pet: item })}
+          >
+            <PetCard pet={item} />
+          </Pressable>
+        )}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
       />

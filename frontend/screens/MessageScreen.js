@@ -1,19 +1,7 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { View, StyleSheet, Pressable, Text, Alert } from "react-native";
-import {
-  GiftedChat,
-  InputToolbar,
-  Send,
-  Actions,
-  Bubble,
-  Day,
-} from "react-native-gifted-chat";
+import React from "react";
+import { View, StyleSheet, Pressable, Text } from "react-native";
+
 import { Icon } from "react-native-elements";
-import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import io from "socket.io-client";
-import { API_BASE_URL } from "../common";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Avatar from "../components/Avatar";
 import GiftedChatComponent from "../components/GiftedChatComponent";
 
@@ -22,7 +10,7 @@ const MessageScreen = ({ route, navigation }) => {
     route.params;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={{ flex: 1 }}>
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" type="material" size={30} />
@@ -71,7 +59,7 @@ const MessageScreen = ({ route, navigation }) => {
         pet={pet}
         isPetOwner={isPetOwner}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

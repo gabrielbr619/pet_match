@@ -11,7 +11,7 @@ import { Icon, Text } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import io from "socket.io-client";
 import { API_BASE_URL } from "../common";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import Avatar from "./Avatar";
 
 const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
@@ -28,6 +28,15 @@ const GiftedChatComponent = ({
   const [images, setImages] = useState([]);
   const [socket, setSocket] = useState(null);
 
+  const getCurrentUserId = () => {
+    if (isPetOwner && pet_owner && pet_owner.id) {
+      return pet_owner.id;
+    } else if (!isPetOwner && userData && userData.id) {
+      return userData.id;
+    }
+    return null; // Retorna null se não puder determinar o ID
+  };
+
   useEffect(() => {
     const newSocket = io(SOCKET_SERVER_URL, {
       transports: ["websocket"],
@@ -37,10 +46,15 @@ const GiftedChatComponent = ({
 
     newSocket.on("connect", () => {
       console.log("Connected to socket server");
-      newSocket.emit("join", { chatId });
+      const userId = getCurrentUserId();
+      if (userId) {
+        newSocket.emit("joinRoom", { userId, chatId });
+      } else {
+        console.error("Unable to determine user ID for socket connection");
+      }
     });
 
-    newSocket.on("receiveMessage", (message) => {
+    newSocket.on("message", (message) => {
       console.log("Received message from socket:", message);
       setMessages((previousMessages) =>
         GiftedChat.append(previousMessages, formatMessage(message))
@@ -51,7 +65,7 @@ const GiftedChatComponent = ({
       console.log("Disconnecting from socket server");
       newSocket.disconnect();
     };
-  }, []);
+  }, [chatId, isPetOwner, pet_owner, userData]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -65,7 +79,6 @@ const GiftedChatComponent = ({
         });
         const data = await response.json();
         const formattedMessages = data.map(formatMessage);
-        console.log(isPetOwner, "IS PEEEEEEEEEET OWNEEEEEEEEEEEER");
         setMessages(formattedMessages); // Assuming the API returns an array of messages
       } catch (error) {
         console.error("Failed to fetch messages:", error);
@@ -109,17 +122,21 @@ const GiftedChatComponent = ({
   const onSend = useCallback(
     async (messages = []) => {
       if (messages.length === 0 && images.length === 0) {
-        // Não envie nada se não houver texto ou imagens
         return;
       }
 
-      const message = messages[0] || {}; // Use o objeto de mensagem ou um vazio
+      const message = messages[0] || {};
       const formData = new FormData();
       formData.append("chatId", chatId);
-      formData.append("senderId", isPetOwner ? pet_owner.id : userData.id);
-      formData.append("content", message.text || ""); // Permitir que o conteúdo seja vazio se não houver texto
+      const senderId = getCurrentUserId();
+      if (!senderId) {
+        console.error("Unable to determine sender ID");
+        Alert.alert("Error", "Unable to send message. Please try again.");
+        return;
+      }
+      formData.append("senderId", senderId);
+      formData.append("content", message.text || "");
 
-      // Verificar se imagens estão presentes e adicioná-las ao FormData
       if (images.length > 0) {
         images.forEach((image, index) => {
           formData.append("images", {
@@ -134,15 +151,13 @@ const GiftedChatComponent = ({
         const response = await fetch(`${API_BASE_URL}messages/`, {
           method: "POST",
           headers: {
-            // Remova o Content-Type dos cabeçalhos. O fetch definirá automaticamente.
             Authorization: `Bearer ${userToken}`,
           },
           body: formData,
         });
 
         if (!response.ok) {
-          // Se a resposta não for ok, obtenha detalhes adicionais
-          const errorData = await response.text(); // Pode ser JSON ou texto
+          const errorData = await response.text();
           throw new Error(
             `HTTP ${response.status} - ${response.statusText}: ${errorData}`
           );
@@ -154,14 +169,24 @@ const GiftedChatComponent = ({
         setMessages((previousMessages) =>
           GiftedChat.append(previousMessages, formattedMessage)
         );
-        setImages([]); // Limpar imagens após o envio
-        socket.emit("sendMessage", formattedMessage);
+        setImages([]);
+
+        if (socket) {
+          socket.emit("message", {
+            chatId,
+            senderId,
+            content: message.text || "",
+            imageUrls: data.image_urls || [],
+          });
+        } else {
+          console.error("Socket is not initialized");
+        }
       } catch (error) {
-        console.error("Failed to send message:", error.message); // Mensagem do erro detalhado
+        console.error("Failed to send message:", error.message);
         Alert.alert("Error", `An error occurred: ${error.message}`);
       }
     },
-    [images, socket, chatId, userToken]
+    [images, socket, chatId, userToken, isPetOwner, pet_owner, userData]
   );
 
   const pickImage = async () => {
@@ -229,7 +254,6 @@ const GiftedChatComponent = ({
   );
 
   const renderAvatar = (props) => {
-    console.log(props);
     const profile_picture = props.currentMessage.user.avatar;
     return (
       <Avatar
@@ -305,11 +329,14 @@ const GiftedChatComponent = ({
     <GiftedChat
       messages={messages}
       onSend={(messages) => onSend(messages)}
+      user={{
+        _id: getCurrentUserId() || "unknown",
+      }}
       renderSend={renderSend}
       renderInputToolbar={renderInputToolbar}
       renderActions={renderActions}
       renderBubble={renderBubble}
-      renderAvatar={renderAvatar} // Usando o renderizador de avatar personalizado
+      renderAvatar={renderAvatar}
       renderDay={renderDay}
     />
   );

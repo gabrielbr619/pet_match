@@ -29,35 +29,33 @@ exports.getUserChats = async (req, res) => {
   try {
     const { id: user_id } = req.params;
 
-    const chatsArray = [];
-
-    // Verifica se o chat já existe
+    // Obtém os chats do usuário
     const chats = await getUserChats(user_id);
 
     if (chats.length === 0) {
       return res.status(200).json("No Chat found");
     }
 
-    // Itera sobre cada chat
-    for (let i = 0; i < chats.length; i++) {
-      const chat = chats[i];
+    // Executa todas as operações de busca em paralelo
+    const chatsArray = await Promise.all(
+      chats.map(async (chat) => {
+        const [user, pet_owner, pet, last_message] = await Promise.all([
+          findUserById(chat.user_id),
+          selectPetOwnerById(chat.pet_owner_id),
+          selectPetById(chat.pet_id),
+          getMessageById(chat.last_message_sent),
+        ]);
 
-      const user = await findUserById(chat.user_id);
-      const pet_owner = await selectPetOwnerById(chat.pet_owner_id);
-      const pet = await selectPetById(chat.pet_id);
-
-      console.log(chat);
-      const last_message = await getMessageById(chat.last_message_sent);
-      console.log(last_message);
-      chatsArray.push({
-        chat_id: chat.id,
-        created_at: chat.created_at,
-        pet_owner,
-        pet,
-        user,
-        last_message: last_message ? last_message : null,
-      });
-    }
+        return {
+          chat_id: chat.id,
+          created_at: chat.created_at,
+          pet_owner,
+          pet,
+          user,
+          last_message: last_message || null,
+        };
+      })
+    );
 
     return res.status(200).json(chatsArray);
   } catch (error) {

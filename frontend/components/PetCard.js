@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import Avatar from "./Avatar";
+import { dogsBreeds, catBreeds } from "../assets/jsons/petBreeds";
 
 const PetCard = ({ pet }) => {
   const { name, age, description, specie, breed, pictures, distance } = pet;
@@ -12,6 +12,15 @@ const PetCard = ({ pet }) => {
       ? `${description.substring(0, 100)}...`
       : description;
 
+  // Função para buscar o label da raça
+  const getBreedLabel = (specie, breedValue) => {
+    const breedsList = specie === "dog" ? dogsBreeds : catBreeds;
+    const breedObj = breedsList.find((b) => b.value === breedValue);
+    return breedObj ? breedObj.label : "Raça não especificada";
+  };
+
+  const breedLabel = getBreedLabel(specie, breed);
+
   return (
     <View style={styles.card}>
       {/* Imagem do pet ou ícone caso não tenha foto */}
@@ -19,19 +28,16 @@ const PetCard = ({ pet }) => {
         rounded
         size={250}
         containerStyle={styles.petImage}
-        source={pet?.pictures?.length > 0 ? { uri: pet.pictures[0] } : null}
+        source={pictures?.length > 0 ? { uri: pictures[0] } : null}
         icon={{ name: "paw", type: "font-awesome", size: 60 }}
       />
 
       <View style={styles.cardContent}>
         <Text style={styles.petName}>{name}</Text>
-        <Text style={styles.petAge}>{age} anos</Text>
+        <Text style={styles.petAge}>
+          {age} anos - {breedLabel}
+        </Text>
         <Text style={styles.petDescription}>{truncatedDescription}</Text>
-        {breed ? (
-          <Text style={styles.petAge}>{breed}</Text>
-        ) : (
-          <Text style={styles.petAge}>"Raça não especificada"</Text>
-        )}
         {distance && (
           <Text style={styles.petDistance}>
             {distance.toFixed(2)} km de distância
