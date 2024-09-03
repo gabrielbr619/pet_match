@@ -1,4 +1,10 @@
 const { Pool } = require("pg");
+
+const cleanCertString = (cert) => {
+  return cert
+    .replace(/\\n/g, "\n")
+    .replace(/(BEGIN|END) CERTIFICATE-----/g, `$1 CERTIFICATE-----\n`);
+};
 require("dotenv").config();
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -7,8 +13,8 @@ const pool = new Pool({
   port: process.env.DB_PORT,
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: true,
-    ca: process.env.DB_SSL_CA,
+    rejectUnauthorized: false,
+    ca: cleanCertString(process.env.DB_SSL_CA),
   },
 });
 
