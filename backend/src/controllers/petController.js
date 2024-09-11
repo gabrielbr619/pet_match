@@ -164,7 +164,7 @@ exports.getRandomPet = async (req, res) => {
     const pet = await getRandomPetForUser(user_id, last_pet_id);
 
     if (!pet) {
-      return res.status(404).json({ message: "No more pets available" });
+      return res.status(200).json({ message: "No more pets available" });
     }
 
     //await markPetAsViewed(user_id, pet.id);
