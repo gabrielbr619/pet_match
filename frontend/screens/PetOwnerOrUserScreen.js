@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Pressable, Alert } from "react-native";
 import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { Button } from "react-native-paper";
 import { API_BASE_URL } from "../common";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PetOwnerOrUserScreen = ({ route, navigation }) => {
   const { username, password, email } = route.params; // Recebe os props
