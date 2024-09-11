@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Text, Pressable, Image, Alert } from "react-native";
-import { TextInput, Button, Checkbox } from "react-native-paper";
+import {
+  TextInput,
+  Button,
+  Checkbox,
+  ActivityIndicator,
+} from "react-native-paper";
 import { SocialIcon } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Google from "expo-auth-session/providers/google";
@@ -18,6 +23,8 @@ const LoginScreen = () => {
   const [remember, setRemember] = useState(false);
   const navigation = useNavigation();
 
+  const [loading, setLoading] = useState(false);
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
     iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
@@ -31,61 +38,82 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}users/login`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          remember,
-        }),
-      });
+      setLoading(true);
 
-      const data = await response.json();
+      if (email === "" || password === "") {
+        setLoading(false);
+        return Alert.alert(
+          "Erro ao Logar",
+          "Verifique se todas informações foram inseridas corretamente."
+        );
+      }
 
-      if (response.ok) {
-        // Store the data using AsyncStorage
-        await AsyncStorage.setItem("userToken", data.token);
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-        await AsyncStorage.setItem("isPetOwner", "false");
-        // Navigate to the main app screen
-        navigation.navigate("Tabs", {
-          screen: "Home",
-          params: { isPetOwner: false },
-        });
+      const userLoginSuccess = await attemptLogin("users");
+      if (userLoginSuccess) {
+        navigateToHome(false);
+        return;
+      }
+
+      const petOwnerLoginSuccess = await attemptLogin("petowners");
+      if (petOwnerLoginSuccess) {
+        navigateToPetOwnerHome();
       } else {
-        const response = await fetch(`${API_BASE_URL}petowners/login`, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            remember,
-          }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          // Store the data using AsyncStorage
-          await AsyncStorage.setItem("userToken", data.token);
-          await AsyncStorage.setItem("user", JSON.stringify(data.owner));
-          await AsyncStorage.setItem("isPetOwner", "true");
-          // Navigate to the main app screen
-          navigation.navigate("Tabs", {
-            screen: "PetOwnerHomeScreen",
-          });
-        }
+        Alert.alert("Login Error", "Credenciais inválidas.");
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Login Error", "An error occurred. Please try again.");
+      Alert.alert("Login Error", "Um erro ocorreu, tente novamente.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Função auxiliar para tentar o login com diferentes endpoints
+  const attemptLogin = async (endpoint) => {
+    const response = await fetch(`${API_BASE_URL}${endpoint}/login`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        remember,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      await storeUserData(data, endpoint === "users");
+      return true;
+    }
+
+    return false;
+  };
+
+  // Função auxiliar para armazenar dados do usuário no AsyncStorage
+  const storeUserData = async (data, isUser) => {
+    await AsyncStorage.setItem("userToken", data.token);
+    await AsyncStorage.setItem(
+      "user",
+      JSON.stringify(isUser ? data.user : data.owner)
+    );
+    await AsyncStorage.setItem("isPetOwner", isUser ? "false" : "true");
+  };
+
+  // Função auxiliar para navegar para a tela do usuário
+  const navigateToHome = (isPetOwner) => {
+    navigation.navigate("Tabs", {
+      screen: isPetOwner ? "PetOwnerHomeScreen" : "Home",
+      params: isPetOwner ? undefined : { isPetOwner: false },
+    });
+  };
+
+  // Função auxiliar para navegar para a tela do dono do pet
+  const navigateToPetOwnerHome = () => {
+    navigateToHome(true);
   };
 
   const handleGoogleLogin = () => {
@@ -111,6 +139,15 @@ const LoginScreen = () => {
       // Você pode usar a authentication.accessToken para chamar a API do Facebook e obter dados do usuário.
     }
   }, [fbResponse]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fc9355" />
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -197,6 +234,12 @@ const LoginScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   container: {
     flex: 1,
     justifyContent: "center",

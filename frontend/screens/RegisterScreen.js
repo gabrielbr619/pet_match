@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { View, StyleSheet, Text, Image, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
-import { SocialIcon } from "react-native-elements";
-import * as Google from "expo-auth-session/providers/google";
-import * as Facebook from "expo-auth-session/providers/facebook";
 import * as WebBrowser from "expo-web-browser";
-import { API_BASE_URL } from "../common";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -15,19 +11,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  // const [request, response, promptAsync] = Google.useAuthRequest({
-  //   expoClientId: "YOUR_EXPO_GOOGLE_CLIENT_ID",
-  //   iosClientId: "YOUR_IOS_GOOGLE_CLIENT_ID",
-  //   androidClientId: "YOUR_ANDROID_GOOGLE_CLIENT_ID",
-  //   webClientId: "YOUR_WEB_GOOGLE_CLIENT_ID",
-  // });
-
-  // const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-  //   clientId: "YOUR_FACEBOOK_APP_ID",
-  // });
-
   const handleRegister = () => {
-    // Verifica se algum dos campos está vazio
     if (username === "" || password === "" || email === "") {
       return Alert.alert(
         "Erro ao cadastrar",
@@ -41,28 +25,6 @@ const RegisterScreen = ({ navigation }) => {
       email,
     });
   };
-
-  // const handleGoogleLogin = () => {
-  //   promptAsync();
-  // };
-
-  // const handleFacebookLogin = () => {
-  //   fbPromptAsync();
-  // };
-
-  // React.useEffect(() => {
-  //   if (response?.type === "success") {
-  //     const { authentication } = response;
-  //     console.log("Google Authentication Success:", authentication);
-  //   }
-  // }, [response]);
-
-  // React.useEffect(() => {
-  //   if (fbResponse?.type === "success") {
-  //     const { authentication } = fbResponse;
-  //     console.log("Facebook Authentication Success:", authentication);
-  //   }
-  // }, [fbResponse]);
 
   return (
     <View style={styles.container}>
@@ -143,24 +105,6 @@ const RegisterScreen = ({ navigation }) => {
           Acesse!
         </Text>
       </Text>
-      {/* <Text style={styles.orText}>Ou acesse com</Text>
-
-      <View style={styles.socialContainer}>
-        <SocialIcon
-          title="Google"
-          button
-          type="google"
-          onPress={handleGoogleLogin}
-          style={styles.socialButtonGoogle}
-        />
-        <SocialIcon
-          title="Facebook"
-          button
-          type="facebook"
-          onPress={handleFacebookLogin}
-          style={styles.socialButtonFacebook}
-        />
-      </View> */}
     </View>
   );
 };
