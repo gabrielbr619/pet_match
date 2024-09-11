@@ -9,6 +9,7 @@ import Tabs from "./screens/Tabs";
 import { View, Text } from "react-native";
 import PetOwnerOrUserScreen from "./screens/PetOwnerOrUserScreen";
 import { API_BASE_URL } from "./common";
+import { ActivityIndicator } from "react-native-paper";
 
 const Stack = createStackNavigator();
 
@@ -82,6 +83,7 @@ const App = () => {
     // Mostra um indicador de carregamento enquanto verifica o token
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#fc9355" />
         <Text>Carregando...</Text>
       </View>
     );

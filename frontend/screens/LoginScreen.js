@@ -20,7 +20,6 @@ WebBrowser.maybeCompleteAuthSession();
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
   const navigation = useNavigation();
 
   const [loading, setLoading] = useState(false);
@@ -39,7 +38,6 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     try {
       setLoading(true);
-
       if (email === "" || password === "") {
         setLoading(false);
         return Alert.alert(
@@ -48,21 +46,30 @@ const LoginScreen = () => {
         );
       }
 
-      const userLoginSuccess = await attemptLogin("users");
-      if (userLoginSuccess) {
-        navigateToHome(false);
-        return;
+      try {
+        const userLoginSuccess = await attemptLogin("users");
+        if (userLoginSuccess) {
+          navigateToHome(false);
+          return;
+        }
+      } catch (error) {
+        console.error("Erro ao tentar login como usuário:", error);
       }
 
-      const petOwnerLoginSuccess = await attemptLogin("petowners");
-      if (petOwnerLoginSuccess) {
-        navigateToPetOwnerHome();
-      } else {
-        Alert.alert("Login Error", "Credenciais inválidas.");
+      try {
+        const petOwnerLoginSuccess = await attemptLogin("petowners");
+        if (petOwnerLoginSuccess) {
+          navigateToPetOwnerHome();
+          return;
+        }
+      } catch (error) {
+        console.error("Erro ao tentar login como dono de pet:", error);
       }
+
+      Alert.alert("Erro de Login", "Credenciais inválidas.");
     } catch (error) {
-      console.error(error);
-      Alert.alert("Login Error", "Um erro ocorreu, tente novamente.");
+      console.error("Erro geral no login:", error);
+      Alert.alert("Erro de Login", "Um erro ocorreu, tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -79,7 +86,6 @@ const LoginScreen = () => {
       body: JSON.stringify({
         email,
         password,
-        remember,
       }),
     });
 

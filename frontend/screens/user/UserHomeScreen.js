@@ -42,6 +42,10 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
       if (!response.ok) {
         throw new Error(data.message || "Erro ao buscar pet");
       }
+      if (data.message) {
+        setPet(null);
+        return setLoading(false);
+      }
       setPet(data);
       setLoading(false);
     } catch (error) {
