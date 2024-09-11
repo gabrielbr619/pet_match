@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, Pressable } from "react-native";
-import { RadioButton } from "react-native-paper";
+import { View, Text, StyleSheet, Image, Pressable, Alert } from "react-native";
+import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { Button } from "react-native-paper";
 import { API_BASE_URL } from "../common";
 
@@ -9,42 +9,77 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
 
   const [userRole, setUserRole] = useState("users");
 
-  const handleRegister = () => {
-    fetch(`${API_BASE_URL}${userRole}/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-        email,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          // Exibe o erro recebido do servidor
-          Alert.alert("Erro ao cadastrar", data.error);
-        } else {
-          // Exibe uma mensagem de sucesso e redireciona o usuário
-          Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-          // Navegar para outra tela ou limpar os campos de input
-        }
-      })
-      .catch((error) => {
-        // Exibe um alerta em caso de erro na requisição
-        Alert.alert(
-          "Erro",
-          "Ocorreu um erro ao realizar o cadastro. Tente novamente."
-        );
-        console.error(error);
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}${userRole}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          email,
+        }),
       });
 
-    navigation.navigate("Login");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao cadastrar");
+      }
+
+      // Armazenar os dados do usuário
+      await AsyncStorage.setItem("userToken", data.token);
+      await AsyncStorage.setItem(
+        "user",
+        JSON.stringify(data.user || data.owner)
+      );
+      await AsyncStorage.setItem(
+        "isPetOwner",
+        (userRole === "petowners").toString()
+      );
+
+      // Navegar para a tela apropriada
+      const targetScreen = userRole === "users" ? "Home" : "PetOwnerHomeScreen";
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "Tabs",
+            params: {
+              screen: targetScreen,
+              params: { isPetOwner: userRole === "petowners" },
+            },
+          },
+        ],
+      });
+
+      Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+    } catch (error) {
+      navigation.goBack();
+      Alert.alert(
+        "Erro",
+        error.message ||
+          "Ocorreu um erro ao realizar o cadastro. Tente novamente."
+      );
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Faz a requisição de registro ao backend
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fc9355" />
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -110,6 +145,11 @@ const PetOwnerOrUserScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
