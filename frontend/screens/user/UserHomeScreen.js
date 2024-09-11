@@ -19,7 +19,6 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
 
   useEffect(() => {
     if (!userData || !userToken) {
-      Alert.alert("Erro", "Dados do usuário não disponíveis.");
       return;
     }
     if (userData.id) {
@@ -40,18 +39,14 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || "Erro ao buscar pet");
       }
-
       setPet(data);
       setLoading(false);
-      console.log(data);
     } catch (error) {
       console.error(error);
       setLoading(false);
-      Alert.alert("Erro", error.message || "Não foi possível carregar um pet.");
     }
   };
 
