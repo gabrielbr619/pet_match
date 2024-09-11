@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Text,
-  Image,
   Pressable,
   Alert,
   ActivityIndicator,
@@ -12,6 +11,7 @@ import { Icon } from "react-native-elements";
 import { API_BASE_URL } from "../../common";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Avatar from "../../components/Avatar";
+import Toast from "react-native-toast-message";
 
 const HomeScreen = ({ navigation, userData, userToken }) => {
   const [pet, setPet] = useState(null);
@@ -25,7 +25,7 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
     if (userData.id) {
       fetchPet(userData.id);
     }
-  }, [userData]);
+  }, [userData, userToken]);
 
   const fetchPet = async (userId) => {
     try {
@@ -38,18 +38,20 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
           Authorization: `Bearer ${userToken}`,
         },
       });
-      if (!response.ok) {
-        setPet(data);
-        return setLoading(false);
-      }
+
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao buscar pet");
+      }
 
       setPet(data);
       setLoading(false);
-      console.log(pet);
+      console.log(data);
     } catch (error) {
       console.error(error);
       setLoading(false);
+      Alert.alert("Erro", error.message || "Não foi possível carregar um pet.");
     }
   };
 
@@ -72,23 +74,44 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
       fetchPet(userData.id); // Fetch a new pet after liking
     } catch (error) {
       console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível descurtir o pet. Tente novamente.",
+        visibilityTime: 2000,
+        position: "bottom",
+      });
     }
   };
 
   const handleDislike = async () => {
     try {
-      // await fetch('API_BASE_URLusers/deslikePet', {
-      //   method: 'PUT',
-      //   headers: {
-      //     Accept: 'application/json',
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${userToken}`,
-      //   },
-      //   body: JSON.stringify({ userData, petId: pet.id }),
-      // });
+      await fetch(`${API_BASE_URL}users/deslikePet`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ userData, petId: pet.id }),
+      });
+      Toast.show({
+        type: "info",
+        text1: "Pet descurtido",
+        text2: "Você não verá mais este pet.",
+        visibilityTime: 2000,
+        position: "bottom",
+      });
       fetchPet(userData.id); // Fetch a new pet after disliking
     } catch (error) {
       console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Não foi possível descurtir o pet. Tente novamente.",
+        visibilityTime: 2000,
+        position: "bottom",
+      });
     }
   };
 
@@ -193,13 +216,6 @@ const HomeScreen = ({ navigation, userData, userToken }) => {
           )}
         </View>
       )}
-
-      {/* <View style={styles.footer}>
-        <Icon name="home" type="font-awesome" size={30} onPress={() => navigation.navigate('Home')} />
-        <Icon name="search" type="font-awesome" size={30} onPress={() => navigation.navigate('Discover')} />
-        <Icon name="comments" type="font-awesome" size={30} onPress={() => navigation.navigate('Chats')} />
-        <Icon name="user" type="font-awesome" size={30} onPress={() => navigation.navigate('Profile')} />
-      </View> */}
     </SafeAreaView>
   );
 };
