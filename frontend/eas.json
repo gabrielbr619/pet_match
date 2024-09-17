@@ -13,12 +13,11 @@
         "buildType": "apk"
       }
     },
-    "preview2": {
+    "production": {
       "android": {
-        "gradleCommand": ":app:assembleRelease"
+        "buildType": "app-bundle"
       }
-    },
-    "production": {}
+    }
   },
   "submit": {
     "production": {}
