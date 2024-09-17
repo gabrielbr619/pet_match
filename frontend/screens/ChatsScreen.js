@@ -180,7 +180,7 @@ const ChatsScreen = ({ navigation }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#fc9355" />
-        <Text>Carregando...</Text>
+        <Text style={{ fontSize: 20 }}>Carregando...</Text>
       </View>
     );
   }

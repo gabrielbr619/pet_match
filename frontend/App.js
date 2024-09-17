@@ -84,7 +84,7 @@ const App = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#fc9355" />
-        <Text>Carregando...</Text>
+        <Text style={{ fontSize: 20 }}>Carregando...</Text>
       </View>
     );
   }

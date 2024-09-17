@@ -16,18 +16,24 @@ const ResultsScreen = ({ route, navigation }) => {
         </Pressable>
         <Text style={styles.headerTitle}>Pets Encontrados</Text>
       </View>
-      <FlatList
-        data={petsData}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => navigation.navigate("PetDetail", { pet: item })}
-          >
-            <PetCard pet={item} />
-          </Pressable>
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-      />
+      {petsData && petsData.length > 0 ? (
+        <FlatList
+          data={petsData}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => navigation.navigate("PetDetail", { pet: item })}
+            >
+              <PetCard pet={item} />
+            </Pressable>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+        />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Nenhum pet foi encontrado :(</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -52,6 +58,15 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     backgroundColor: "#f0f0f0",
+  },
+  emptyText: {
+    fontSize: 18,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
 
