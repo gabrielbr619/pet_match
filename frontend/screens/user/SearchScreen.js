@@ -18,6 +18,9 @@ import { Picker } from "@react-native-picker/picker";
 import { dogsBreeds, catBreeds } from "../../assets/jsons/petBreeds";
 import { API_BASE_URL } from "../../common";
 import { GOOGLE_MAPS_API_KEY } from "@env";
+import { ScrollView } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { ActivityIndicator } from "react-native-paper";
 
 const SearchScreen = ({ navigation, userData, userToken }) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -26,6 +29,8 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
   const [petSize, setPetSize] = useState(50);
   const [location, setLocation] = useState("");
   const [userCoordinates, setUserCoordinates] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
   const googlePlacesRef = useRef();
@@ -81,6 +86,7 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
     };
 
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}pets/search`, {
         method: "POST",
         headers: {
@@ -91,6 +97,7 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
       });
 
       if (!response.ok) {
+        setLoading(false);
         throw new Error("Erro ao buscar pets. Tente novamente mais tarde.");
       }
 
@@ -99,20 +106,30 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
       console.log("Pets encontrados:", petsData);
 
       // Navegar para a tela de resultados com os dados dos pets
+      setLoading(false);
       navigation.navigate("Results", {
         petsData,
       });
     } catch (error) {
+      setLoading(false);
       console.error(error);
       Alert.alert("Erro", "Não foi possível buscar pets no momento.");
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fc9355" />
+        <Text style={{ fontSize: 20 }}>Carregando...</Text>
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled={true}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.contentContainer}>
@@ -126,6 +143,7 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
               <CheckBox
                 title="Gato"
                 checkedIcon="dot-circle-o"
+                checkedColor="#fc9355"
                 uncheckedIcon="circle-o"
                 checked={selectedSpecie === "cat"}
                 onPress={() => setSelectedSpecie("cat")}
@@ -134,6 +152,7 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
               <CheckBox
                 title="Cachorro"
                 checkedIcon="dot-circle-o"
+                checkedColor="#fc9355"
                 uncheckedIcon="circle-o"
                 checked={selectedSpecie === "dog"}
                 onPress={() => setSelectedSpecie("dog")}
@@ -141,37 +160,52 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
               />
             </View>
             <Text style={styles.subtitle}>Procura alguma raça?</Text>
-            <Picker
-              selectedValue={selectedBreed}
-              onValueChange={(itemValue) => setSelectedBreed(itemValue)}
-              itemStyle={{ borderBottomWidth: 1, borderColor: "#FF914D" }}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#fc9355",
+                borderRadius: 10,
+                backgroundColor: "white",
+                marginTop: 10,
+                marginBottom: 15,
+              }}
             >
-              <Picker.Item label="Não me importo" value={null} />
-              {selectedSpecie === "dog"
-                ? dogsBreeds
-                    .sort((a, b) => a.label.localeCompare(b.label))
-                    .map((breed) => (
-                      <Picker.Item
-                        key={breed.value}
-                        label={breed.label}
-                        value={breed.value}
-                      />
-                    ))
-                : catBreeds
-                    .sort((a, b) => a.label.localeCompare(b.label))
-                    .map((breed) => (
-                      <Picker.Item
-                        key={breed.value}
-                        label={breed.label}
-                        value={breed.value}
-                      />
-                    ))}
-            </Picker>
+              <Picker
+                selectedValue={selectedBreed}
+                selectionColor={"#fc9355"}
+                dropdownIconColor={"#fc9355"}
+                dropdownIconRippleColor={"#fc9355"}
+                onValueChange={(itemValue) => setSelectedBreed(itemValue)}
+                itemStyle={{ borderBottomWidth: 1, borderColor: "#FF914D" }}
+              >
+                <Picker.Item label="Não me importo" value={null} />
+                {selectedSpecie === "dog"
+                  ? dogsBreeds
+                      .sort((a, b) => a.label.localeCompare(b.label))
+                      .map((breed) => (
+                        <Picker.Item
+                          key={breed.value}
+                          label={breed.label}
+                          value={breed.value}
+                        />
+                      ))
+                  : catBreeds
+                      .sort((a, b) => a.label.localeCompare(b.label))
+                      .map((breed) => (
+                        <Picker.Item
+                          key={breed.value}
+                          label={breed.label}
+                          value={breed.value}
+                        />
+                      ))}
+              </Picker>
+            </View>
             <Text style={styles.subtitle}>Escolha o gênero do pet</Text>
             <View style={styles.checkboxContainer}>
               <CheckBox
                 title="Masculino"
                 checkedIcon="dot-circle-o"
+                checkedColor="#fc9355"
                 uncheckedIcon="circle-o"
                 checked={selectedGender === "Male"}
                 onPress={() => setSelectedGender("Male")}
@@ -180,6 +214,7 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
               <CheckBox
                 title="Feminino"
                 checkedIcon="dot-circle-o"
+                checkedColor="#fc9355"
                 uncheckedIcon="circle-o"
                 checked={selectedGender === "Female"}
                 onPress={() => setSelectedGender("Female")}
@@ -187,7 +222,9 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
               />
             </View>
 
-            <Text style={styles.subtitle}>
+            <Text
+              style={{ fontSize: 14, fontWeight: "bold", marginVertical: 10 }}
+            >
               Compartilhe sua localização para encontrar pets próximos
             </Text>
             <GooglePlacesAutocomplete
@@ -227,12 +264,17 @@ const SearchScreen = ({ navigation, userData, userToken }) => {
             </View>
           </View>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
@@ -246,9 +288,10 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
   },
   welcome: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 5,
+    marginTop: 20,
   },
   title: {
     fontSize: 16,
@@ -258,7 +301,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontWeight: "bold",
-    marginVertical: 10,
+    marginTop: 10,
   },
   checkboxContainer: {
     flexDirection: "row",
@@ -268,18 +311,13 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderWidth: 0,
   },
-  autocompleteContainer: {
-    flex: 0,
-    position: "relative",
-    zIndex: 1,
-    marginHorizontal: 20,
-  },
+  autocompleteContainer: {},
   autocompleteInput: {
     fontSize: 16,
     backgroundColor: "white",
-    borderColor: "#ddd",
+    borderColor: "#fc9355",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
   },
   autocompleteListView: {
     borderWidth: 1,
