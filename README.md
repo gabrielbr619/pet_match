@@ -1,13 +1,25 @@
 # 🐾 Pet Match
+![image](https://github.com/user-attachments/assets/5629917d-3ff8-4801-ab83-44215abc31ce)
 
 Pet Match é um aplicativo que ajuda pessoas a encontrar o pet perfeito para adoção, conectando usuários a animais próximos de acordo com suas preferências. O projeto foi desenvolvido utilizando React Native e integra várias APIs para busca de localização e adoção de pets.
 
 ## 🚀 Funcionalidades
 
-- Criação de login e personalização de conta
-- Busca por localização: Compartilhe sua localização para encontrar pets próximos.
+- Criação de login e personalização de conta\
+ ![image](https://github.com/user-attachments/assets/bb16b116-6a91-4f0f-a907-5b1f38f1bcdc)
+
+- Busca por localização: Compartilhe sua localização para encontrar pets próximos.\
+  ![image](https://github.com/user-attachments/assets/a69a28cc-0ecd-4b6a-9c36-7603a47cb9df)
+
 - Resultados personalizados: A partir das preferências escolhidas, os usuários podem visualizar uma lista de pets disponíveis para adoção.
-- Chat entre usuário e doador do pet
+- Chat entre usuário e doador do pet\
+  ![image](https://github.com/user-attachments/assets/119bab66-5ff8-4693-80f2-94ef33f1af26)
+
+- Adição e edição de pets(Doador)\
+  ![image](https://github.com/user-attachments/assets/eea62200-0459-470b-ae2b-a5e15f042aec)
+  ![image](https://github.com/user-attachments/assets/646be048-cbf9-4eb5-bd2d-8b216c9f49ec)
+
+
 
 ## 🛠️ Tecnologias Utilizadas
 
