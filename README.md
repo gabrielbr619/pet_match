@@ -45,8 +45,10 @@ Pet Match é um aplicativo que ajuda pessoas a encontrar o pet perfeito para ado
 
 ## 🐞 Problemas Conhecidos
 
-Caso o usuário não permita o acesso à localização, a busca por pets baseados na proximidade não funcionará.
-Em dispositivos mais antigos, pode haver lentidão no carregamento dos resultados.
+- Caso o usuário não permita o acesso à localização, a busca por pets baseados na proximidade não funcionará.
+- Em dispositivos mais antigos, pode haver lentidão no carregamento dos resultados.
+- Falta de feedback para o usuário em algumas telas
+- Falta de verificação de email
 
 ## 🗺️ Funcionalidades Futuras
 
